@@ -177,6 +177,7 @@ Proyek **sepenuhnya native, tanpa library dan framework**. Berlaku untuk semua a
 - Ambil `main` terbaru (`git pull`) sebelum mulai kerja setiap hari.
 - File bersama (layout, helper, `schema.sql`) diubah hanya oleh PIC-nya; anggota lain meminta lewat chat.
 - Perubahan skema database diumumkan ke semua, lalu `schema.sql` diperbarui bersamaan.
+- `.gitkeep` hanya digunakan agar folder kosong tetap terlihat di Git. Hapus `.gitkeep` dari folder setelah menambahkan file proyek nyata ke folder tersebut; biarkan bila folder masih kosong.
 
 ## 8. Titik Kritis Jadwal
 
@@ -211,8 +212,7 @@ Proyek **sepenuhnya native, tanpa library dan framework**. Berlaku untuk semua a
 ## 10. Pelacak Progres
 
 Centang saat langkah selesai.
-
-- [ ] Fase 0: S01 S02 S03 S04
+- [✓] Fase 0: S01 S02 S03 S04
 - [ ] Fase 1: S05 S06 S07 S08 S09
 - [ ] Fase 2: S10 S11 S12 S13 S14 S15 S16
 - [ ] Fase 3: S17 S18 S19 S20 S21 S22 S23 S24 S25 S26 S27 S28 S29
