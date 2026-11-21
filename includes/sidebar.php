@@ -13,14 +13,14 @@ $semua_menu = [
     'petani' => [
         ['dashboard', 'Dashboard',    'index.php',     '📊'],
         ['lelang',    'Lelang Panen', 'lelang/', '🌾'],
-        ['erp',       'ERP Keuangan', 'erp.php',       '💰'],
-        ['musim',     'Musim Tanam',  'musim.php',     '📅'],
+        ['erp',       'ERP Keuangan', 'erp/',       '💰'],
+        ['musim',     'Musim Tanam',  'musim/',     '📅'],
         ['saprotan',  'Saprotan',     'saprotan.php',  '🛒'],
-        ['lowongan',  'Lowongan',     'lowongan.php',  '👷'],
+        ['lowongan',  'Lowongan',     'lowongan/', '👷'],
     ],
     'tengkulak' => [
         ['dashboard', 'Dashboard',       'index.php',     '📊'],
-        ['pasar',     'Pasar Lelang',    'pasar/index.php', '🏷️'],
+        ['pasar',     'Pasar Lelang',    'pasar/', '🏷️'],
     ],
     'kios' => [
         ['dashboard', 'Dashboard',      'index.php',     '📊'],
