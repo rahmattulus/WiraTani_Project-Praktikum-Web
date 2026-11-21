@@ -1,10 +1,10 @@
 <?php
 /* Petani: form pesan saprotan (S13, Marvian). UI dengan data dummy.
    Dibuka dari katalog: saprotan_pesan.php?produk_id=1 */
-require_once __DIR__ . '/../includes/auth_guard.php';
+require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
-require_once __DIR__ . '/../includes/saprotan_helper.php';
-require_once __DIR__ . '/../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../../includes/saprotan_helper.php';
+require_once __DIR__ . '/../../includes/dummy_saprotan.php';
 
 $produk = cari_produk((int) input_teks($_GET, 'produk_id'));
 if (!$produk || $produk['stok'] <= 0) {

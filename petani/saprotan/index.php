@@ -1,9 +1,9 @@
 <?php
 /* Petani: katalog saprotan dari semua kios (S13, Marvian). UI dengan data dummy. */
-require_once __DIR__ . '/../includes/auth_guard.php';
+require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
-require_once __DIR__ . '/../includes/saprotan_helper.php';
-require_once __DIR__ . '/../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../../includes/saprotan_helper.php';
+require_once __DIR__ . '/../../includes/dummy_saprotan.php';
 
 $q        = input_teks($_GET, 'q');
 $lokasi   = input_teks($_GET, 'lokasi');
