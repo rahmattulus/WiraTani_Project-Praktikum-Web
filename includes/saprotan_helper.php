@@ -1,7 +1,7 @@
 <?php
 /*
  * saprotan_helper.php (Marvian): label, badge, dan hitung total untuk modul saprotan.
- * Berkas ini TETAP dipakai setelah Fase 3 (tidak seperti dummy_saprotan.php).
+ * Berkas pembantu yang dipakai oleh katalog, pesanan, dan riwayat saprotan.
  */
 
 const KATEGORI_SAPROTAN = [

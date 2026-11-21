@@ -1,28 +1,32 @@
 <?php
-/* Petani: riwayat pesanan saprotan (S13, Marvian). UI dengan data dummy. */
+/* Petani: riwayat pesanan saprotan (S13/S22, Marvian). */
 require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
 require_once __DIR__ . '/../../includes/saprotan_helper.php';
-require_once __DIR__ . '/../../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../../config/koneksi.php';
 
 $status = input_teks($_GET, 'status');
 if (!isset(STATUS_PESANAN[$status])) {
   $status = '';
 }
 
-// TODO S22: SELECT ... FROM pesanan_saprotan ps JOIN produk_saprotan p ... JOIN users k ...
-//           WHERE ps.user_id = ? ORDER BY ps.created_at DESC
-$pesanan = [];
-foreach ($dummy_pesanan as $ps) {
-  if ($ps['user_id'] !== $dummy_user_petani || ($status !== '' && $ps['status'] !== $status)) {
-    continue;
-  }
-  $ps['produk'] = cari_produk($ps['produk_saprotan_id']);
-  $pesanan[]    = $ps;
+$sql = 'SELECT ps.*, p.nama_produk, p.kategori, p.satuan, k.nama AS nama_kios
+        FROM pesanan_saprotan ps
+        JOIN produk_saprotan p ON p.id = ps.produk_saprotan_id
+        JOIN users k ON k.id = p.user_id
+        WHERE ps.user_id = ?';
+$params = [$_SESSION['user_id']];
+$types = 'i';
+if ($status !== '') {
+    $sql .= ' AND ps.status = ?';
+    $params[] = $status;
+    $types .= 's';
 }
-usort($pesanan, function ($a, $b) {
-  return strcmp($b['created_at'], $a['created_at']);
-});
+$sql .= ' ORDER BY ps.created_at DESC, ps.id DESC';
+$stmt = $koneksi->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$pesanan = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $judul_halaman = 'Riwayat Pesanan Saprotan';
 $menu_aktif    = 'saprotan';
@@ -33,7 +37,7 @@ include __DIR__ . '/../includes/sidebar.php';
   <section class="card">
     <div class="card-head">
       <h2 class="card-title">Pesanan saya</h2>
-      <a class="btn btn-ghost btn-sm" href="saprotan.php">Kembali ke katalog</a>
+      <a class="btn btn-ghost btn-sm" href="index.php">Kembali ke katalog</a>
     </div>
 
     <form class="filter-bar" method="get" action="">
@@ -52,7 +56,7 @@ include __DIR__ . '/../includes/sidebar.php';
     <?php if (!$pesanan): ?>
       <div class="empty-state">
         <p>Belum ada pesanan<?= $status !== '' ? ' dengan status ' . e(strtolower(STATUS_PESANAN[$status])) : '' ?>.</p>
-        <a class="btn btn-primary" href="saprotan.php">Lihat katalog saprotan</a>
+        <a class="btn btn-primary" href="index.php">Lihat katalog saprotan</a>
       </div>
     <?php else: ?>
       <div class="table-wrap">
@@ -69,17 +73,16 @@ include __DIR__ . '/../includes/sidebar.php';
           </thead>
           <tbody>
             <?php foreach ($pesanan as $ps): ?>
-              <?php $p = $ps['produk']; ?>
               <tr>
                 <td data-label="Tanggal"><?= e(format_tanggal($ps['created_at'])) ?></td>
                 <td data-label="Produk">
-                  <?= e($p['nama_produk']) ?>
-                  <?php if ($p['kategori'] === 'sewa_alat'): ?>
+                  <?= e($ps['nama_produk']) ?>
+                  <?php if ($ps['kategori'] === 'sewa_alat'): ?>
                     <br><small>Mulai sewa <?= e(format_tanggal($ps['tanggal_mulai_sewa'])) ?>, <?= (int) $ps['durasi_hari'] ?> hari</small>
                   <?php endif; ?>
                 </td>
-                <td data-label="Kios"><?= e($p['nama_kios']) ?></td>
-                <td data-label="Jumlah"><?= (int) $ps['jumlah'] ?> <?= e($p['kategori'] === 'sewa_alat' ? 'unit' : $p['satuan']) ?></td>
+                <td data-label="Kios"><?= e($ps['nama_kios']) ?></td>
+                <td data-label="Jumlah"><?= (int) $ps['jumlah'] ?> <?= e($ps['kategori'] === 'sewa_alat' ? 'unit' : $ps['satuan']) ?></td>
                 <td data-label="Total"><?= e(format_rupiah($ps['total_harga'])) ?></td>
                 <td data-label="Status"><?= badge_pesanan($ps['status']) ?></td>
               </tr>

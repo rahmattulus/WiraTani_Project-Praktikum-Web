@@ -15,36 +15,42 @@ include __DIR__ . '/includes/header.php';
 ?>
     <div class="dash">
       <section class="hero">
-        <h1>Panen dihargai adil, usaha tani tercatat rapi</h1>
+        <p><strong>Ekosistem usaha tani digital</strong></p>
+        <h1>Panen dihargai adil,<br>usaha tani tercatat rapi</h1>
         <p>
-          Harga panen sering ditentukan sepihak dan modal tanam jarang tercatat.
-          WiraTani mempertemukan petani, tengkulak, dan kios tani dalam satu platform,
-          supaya harga terbentuk dari penawaran terbuka dan laba rugi tiap musim tanam terlihat jelas.
+          WiraTani mempertemukan petani, tengkulak, kios tani, dan buruh tani
+          dalam satu platform untuk membuat transaksi lebih terbuka, modal usaha
+          mudah tercatat, dan pekerjaan tani lebih transparan.
         </p>
         <div class="form-actions hero-actions">
-          <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register.php">Daftar gratis</a>
-          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/login.php">Masuk</a>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register.php">Mulai sekarang</a>
+          <a class="btn btn-ghost" href="<?= BASE_URL ?>/publik/bursa.php">Lihat bursa kerja</a>
         </div>
       </section>
 
       <section class="feature-grid" aria-label="Manfaat WiraTani">
         <article class="card">
+          <span class="badge badge-info">Lelang</span>
           <h2 class="card-title">Lelang panen yang adil</h2>
           <p>
             Petani membuka lelang hasil panen. Tengkulak mengirim penawaran, dan petani
             memilih penawaran terbaik, sehingga harga tidak lagi ditentukan sepihak.
           </p>
+          <a class="card-link" href="<?= BASE_URL ?>/auth/login.php">Kelola lelang</a>
         </article>
 
         <article class="card">
+          <span class="badge badge-success">ERP</span>
           <h2 class="card-title">Catat keuangan tiap musim</h2>
           <p>
             Pendapatan dari lelang dan biaya pupuk, bibit, serta sewa alat dari kios masuk
             ke catatan musim tanam, lengkap dengan laba atau rugi.
           </p>
+          <a class="card-link" href="<?= BASE_URL ?>/auth/login.php">Lihat pencatatan</a>
         </article>
 
         <article class="card">
+          <span class="badge badge-warning">Bursa kerja</span>
           <h2 class="card-title">Bursa kerja buruh tani</h2>
           <p>
             Petani memasang lowongan kerja harian dengan upah yang jelas. Buruh tani bisa
