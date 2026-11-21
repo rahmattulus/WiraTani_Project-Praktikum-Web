@@ -12,7 +12,7 @@ $menu_aktif    = $menu_aktif ?? '';
 $semua_menu = [
     'petani' => [
         ['dashboard', 'Dashboard',    'index.php',     '📊'],
-        ['lelang',    'Lelang Panen', 'lelang.php',    '🌾'],
+        ['lelang',    'Lelang Panen', 'lelang/', '🌾'],
         ['erp',       'ERP Keuangan', 'erp.php',       '💰'],
         ['musim',     'Musim Tanam',  'musim.php',     '📅'],
         ['saprotan',  'Saprotan',     'saprotan.php',  '🛒'],
@@ -20,8 +20,7 @@ $semua_menu = [
     ],
     'tengkulak' => [
         ['dashboard', 'Dashboard',       'index.php',     '📊'],
-        ['pasar',     'Pasar Lelang',    'pasar.php',     '🏷️'],
-        ['penawaran', 'Penawaran Saya',  'penawaran.php', '🤝'],
+        ['pasar',     'Pasar Lelang',    'pasar/index.php', '🏷️'],
     ],
     'kios' => [
         ['dashboard', 'Dashboard',      'index.php',     '📊'],

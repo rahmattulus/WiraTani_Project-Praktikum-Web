@@ -1,5 +1,5 @@
 /* app.js: JavaScript vanilla, tanpa library.
-   Isi: laci menu, konfirmasi aksi, penutup flash message, estimasi total pesanan. */
+   Isi: laci menu, modal tawaran, konfirmasi aksi, flash message, estimasi pesanan. */
 
 (function () {
   'use strict';
@@ -16,6 +16,73 @@
     overlay.addEventListener('click', function () {
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
+    });
+  }
+
+  /* Modal detail tawaran dan pemilihan pemenang lelang */
+  var offerDialog = document.querySelector('[data-offer-dialog]');
+  if (offerDialog) {
+    var offerButtons = document.querySelectorAll('[data-offer-detail]');
+    var winnerForm = offerDialog.querySelector('[data-winner-form]');
+    var unavailableMessage = offerDialog.querySelector('[data-modal-unavailable]');
+
+    offerButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        offerDialog.querySelector('[data-modal-name]').textContent = button.getAttribute('data-offer-name');
+        offerDialog.querySelector('[data-modal-price]').textContent = button.getAttribute('data-offer-price');
+        offerDialog.querySelector('[data-modal-payment]').textContent = button.getAttribute('data-offer-payment');
+        offerDialog.querySelector('[data-modal-time]').textContent = button.getAttribute('data-offer-time');
+        offerDialog.querySelector('[data-modal-armada]').textContent = button.getAttribute('data-offer-armada');
+        offerDialog.querySelector('[data-modal-catatan]').textContent = button.getAttribute('data-offer-catatan');
+
+        var status = offerDialog.querySelector('[data-modal-status]');
+        status.className = 'badge ' + button.getAttribute('data-offer-status-class');
+        status.textContent = button.getAttribute('data-offer-status');
+
+        if (winnerForm) {
+          winnerForm.querySelector('[name="id"]').value = button.getAttribute('data-offer-id');
+          winnerForm.hidden = button.getAttribute('data-can-select') !== '1';
+        }
+        if (unavailableMessage) {
+          unavailableMessage.hidden = button.getAttribute('data-can-select') === '1';
+        }
+
+        if (typeof offerDialog.showModal === 'function') {
+          offerDialog.showModal();
+        } else {
+          offerDialog.setAttribute('open', '');
+        }
+      });
+    });
+
+    offerDialog.querySelectorAll('[data-modal-close]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        if (typeof offerDialog.close === 'function') {
+          offerDialog.close();
+        } else {
+          offerDialog.removeAttribute('open');
+        }
+      });
+    });
+
+    offerDialog.addEventListener('click', function (ev) {
+      if (ev.target === offerDialog) {
+        if (typeof offerDialog.close === 'function') {
+          offerDialog.close();
+        } else {
+          offerDialog.removeAttribute('open');
+        }
+      }
+    });
+
+    offerDialog.addEventListener('close', function () {
+      if (winnerForm) {
+        winnerForm.reset();
+        winnerForm.hidden = true;
+      }
+      if (unavailableMessage) {
+        unavailableMessage.hidden = true;
+      }
     });
   }
 
