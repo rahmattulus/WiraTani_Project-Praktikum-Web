@@ -40,7 +40,8 @@ function user_id_login(): int
 
 function url_dashboard(string $role): string
 {
-    return BASE_URL . '/' . $role . '/dashboard.php';
+    $berkas = $role === 'petani' ? 'index.php' : 'dashboard.php';
+    return BASE_URL . '/' . $role . '/' . $berkas;
 }
 
 function wajib_login(?string $role = null): void
