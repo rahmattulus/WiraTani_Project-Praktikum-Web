@@ -214,8 +214,8 @@ Proyek **sepenuhnya native, tanpa library dan framework**. Berlaku untuk semua a
 
 Centang saat langkah selesai.
 - [✓] Fase 0: S01 S02 S03 S04
-- [ ] Fase 1: S05 S06 S07 S08 S09
-- [ ] Fase 2: S10 S11 S12 S13 S14 S15 S16
+- [✓] Fase 1: S05 S06 S07 S08 S09
+- [✓] Fase 2: S10 S11 S12 S13 S14 S15 S16
 - [ ] Fase 3: S17 S18 S19 S20 S21 S22 S23 S24 S25 S26 S27 S28 S29
 - [ ] Fase 4: S30 S31 S32 S33 S34 S35 S36
 - [ ] Fase 5: S37 S38 S39 S40 S41
