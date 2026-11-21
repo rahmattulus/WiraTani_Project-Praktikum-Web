@@ -1,38 +1,45 @@
 <?php
-/* Petani: detail lelang, daftar tawaran, dan UI pilih pemenang (S10). */
+/* Petani: detail lelang dan daftar tawaran (S10, S17). */
 require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
-require_once __DIR__ . '/../../includes/dummy_lelang.php';
+require_once __DIR__ . '/../../config/koneksi.php';
+require_once __DIR__ . '/../../includes/lelang_helper.php';
 
+$user_id = user_id_login();
 $id = (int) input_teks($_GET, 'id');
+$database_error = '';
 $hasil = null;
-foreach ($dummy_hasil_panen as $item) {
-    if ($item['id'] === $id && $item['user_id'] === $dummy_lelang_petani_id) {
-        $hasil = $item;
-        break;
+$penawaran_hasil = [];
+$musim_berjalan = [];
+
+try {
+    $hasil = ambil_hasil_panen_petani($koneksi, $id, $user_id);
+    if (!$hasil) {
+        set_flash('error', 'Lelang tidak ditemukan atau bukan milik Anda.');
+        redirect('index.php');
     }
+
+    $penawaran_hasil = ambil_penawaran_hasil_panen($koneksi, $id);
+    $stmt = $koneksi->prepare(
+        "SELECT id, nama_musim, komoditas
+         FROM musim_tanam
+         WHERE user_id = ? AND status = 'berjalan'
+         ORDER BY tanggal_mulai DESC, id DESC"
+    );
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $musim_berjalan = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} catch (mysqli_sql_exception $exception) {
+    error_log('Gagal memuat detail lelang petani: ' . $exception->getMessage());
+    $database_error = 'Detail lelang gagal dimuat. Silakan muat ulang halaman.';
 }
 
-if (!$hasil) {
-    set_flash('error', 'Data lelang tidak ditemukan.');
-    redirect('index.php');
-}
+$boleh_ubah = $hasil && $hasil['status'] === 'aktif' && (int) $hasil['jumlah_tawaran'] === 0;
 
-$penawaran_hasil = array_values(array_filter($dummy_penawaran_lelang, function ($penawaran) use ($id) {
-    return $penawaran['hasil_panen_id'] === $id;
-}));
-usort($penawaran_hasil, function ($a, $b) {
-    return $b['harga_tawar'] <=> $a['harga_tawar'];
-});
-$musim_berjalan = array_values(array_filter($dummy_musim_tanam_lelang, function ($musim) use ($dummy_lelang_petani_id) {
-    return $musim['user_id'] === $dummy_lelang_petani_id && $musim['status'] === 'berjalan';
-}));
-$boleh_ubah = $hasil['status'] === 'aktif' && count($penawaran_hasil) === 0;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $database_error === '') {
     wajib_csrf('detail.php?id=' . $id);
-    // TODO S17: validasi kepemilikan tawaran dan musim, lalu tetapkan pemenang.
-    set_flash('info', 'Penetapan pemenang belum tersambung ke database (mode tampilan dengan data dummy).');
+    set_flash('info', 'Penetapan pemenang dikerjakan pada tahap S24.');
     redirect('detail.php?id=' . $id);
 }
 
@@ -42,6 +49,9 @@ include __DIR__ . '/../../includes/header.php';
 include __DIR__ . '/../../includes/sidebar.php';
 ?>
       <div class="dash">
+        <?php if ($database_error !== ''): ?>
+          <div class="alert alert-error" role="alert"><?= e($database_error) ?></div>
+        <?php else: ?>
         <section class="card">
           <div class="card-head">
             <h2 class="card-title"><?= e($hasil['komoditas']) ?></h2>
@@ -69,7 +79,7 @@ include __DIR__ . '/../../includes/sidebar.php';
             </div>
           </div>
 
-          <?php if ($hasil['deskripsi'] !== ''): ?>
+          <?php if ($hasil['deskripsi'] !== null && $hasil['deskripsi'] !== ''): ?>
             <p><?= nl2br(e($hasil['deskripsi'])) ?></p>
           <?php endif; ?>
 
@@ -209,4 +219,5 @@ include __DIR__ . '/../../includes/sidebar.php';
           </dialog>
         <?php endif; ?>
       </div>
+        <?php endif; ?>
 <?php include __DIR__ . '/../../includes/footer.php'; ?>

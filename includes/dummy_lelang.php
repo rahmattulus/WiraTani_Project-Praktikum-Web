@@ -3,13 +3,13 @@
  * dummy_lelang.php: data demo UI S10-S11. Hapus saat modul disambungkan ke database.
  * Nama kunci mengikuti kolom hasil_panen, penawaran_lelang, dan musim_tanam.
  */
+require_once __DIR__ . '/lelang_helper.php';
 
 $dummy_lelang_petani_id = 1;
 $dummy_nama_petani = [
     1 => 'Budi Santoso',
     2 => 'Siti Rahayu',
 ];
-
 $dummy_hasil_panen = [
     [
         'id' => 101,
@@ -165,39 +165,3 @@ $dummy_musim_tanam_lelang = [
         'status' => 'selesai',
     ],
 ];
-
-function label_status_lelang(string $status): string
-{
-    return [
-        'aktif' => 'Aktif',
-        'selesai' => 'Selesai',
-        'dibatalkan' => 'Dibatalkan',
-    ][$status] ?? $status;
-}
-
-function kelas_status_lelang(string $status): string
-{
-    return [
-        'aktif' => 'badge-info',
-        'selesai' => 'badge-success',
-        'dibatalkan' => 'badge-danger',
-    ][$status] ?? 'badge-muted';
-}
-
-function label_status_penawaran(string $status): string
-{
-    return [
-        'menunggu' => 'Menunggu',
-        'menang' => 'Menang',
-        'kalah' => 'Kalah',
-    ][$status] ?? $status;
-}
-
-function kelas_status_penawaran(string $status): string
-{
-    return [
-        'menunggu' => 'badge-warning',
-        'menang' => 'badge-success',
-        'kalah' => 'badge-muted',
-    ][$status] ?? 'badge-muted';
-}
