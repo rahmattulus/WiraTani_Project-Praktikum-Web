@@ -1,9 +1,9 @@
 <?php
-/* Petani: katalog saprotan dari semua kios (S13, Marvian). UI dengan data dummy. */
+/* Petani: katalog saprotan dari semua kios (S13/S22, Marvian). */
 require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
 require_once __DIR__ . '/../../includes/saprotan_helper.php';
-require_once __DIR__ . '/../../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../../config/koneksi.php';
 
 $q        = input_teks($_GET, 'q');
 $lokasi   = input_teks($_GET, 'lokasi');
@@ -12,21 +12,37 @@ if (!isset(KATEGORI_SAPROTAN[$kategori])) {
     $kategori = '';
 }
 
-// TODO S22: SELECT p.*, u.nama AS nama_kios, u.alamat AS alamat_kios
-//           FROM produk_saprotan p JOIN users u ON u.id = p.user_id
-//           WHERE (p.nama_produk LIKE ? OR u.nama LIKE ?) AND u.alamat LIKE ? [AND p.kategori = ?]
-$produk = array_filter($dummy_produk, function ($p) use ($q, $lokasi, $kategori) {
-    if ($kategori !== '' && $p['kategori'] !== $kategori) {
-        return false;
-    }
-    if ($q !== '' && stripos($p['nama_produk'] . ' ' . $p['nama_kios'], $q) === false) {
-        return false;
-    }
-    if ($lokasi !== '' && stripos($p['alamat_kios'], $lokasi) === false) {
-        return false;
-    }
-    return true;
-});
+$sql = 'SELECT p.*, u.nama AS nama_kios, u.alamat AS alamat_kios
+        FROM produk_saprotan p
+        JOIN users u ON u.id = p.user_id
+        WHERE p.stok > 0';
+$params = [];
+$types = '';
+if ($q !== '') {
+    $sql .= ' AND (p.nama_produk LIKE ? OR u.nama LIKE ?)';
+    $like = '%' . $q . '%';
+    $params[] = $like;
+    $params[] = $like;
+    $types .= 'ss';
+}
+if ($lokasi !== '') {
+    $sql .= ' AND u.alamat LIKE ?';
+    $lokasi_like = '%' . $lokasi . '%';
+    $params[] = $lokasi_like;
+    $types .= 's';
+}
+if ($kategori !== '') {
+    $sql .= ' AND p.kategori = ?';
+    $params[] = $kategori;
+    $types .= 's';
+}
+$sql .= ' ORDER BY p.nama_produk ASC';
+$stmt = $koneksi->prepare($sql);
+if ($params) {
+    $stmt->bind_param($types, ...$params);
+}
+$stmt->execute();
+$produk = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $judul_halaman = 'Saprotan';
 $menu_aktif    = 'saprotan';
@@ -64,7 +80,7 @@ include __DIR__ . '/../includes/sidebar.php';
           <?php if (!$produk): ?>
             <div class="empty-state">
               <p>Tidak ada produk yang cocok dengan pencarian Anda.</p>
-              <a class="btn btn-ghost" href="saprotan.php">Tampilkan semua produk</a>
+              <a class="btn btn-ghost" href="index.php">Tampilkan semua produk</a>
             </div>
           <?php else: ?>
             <div class="table-wrap">

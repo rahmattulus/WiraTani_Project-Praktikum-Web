@@ -1,14 +1,40 @@
 <?php
-/* Kios: daftar produk saya (S12, Marvian). UI dengan data dummy. */
+/* Kios: daftar produk milik kios (S12/S18, Marvian). */
 require_once __DIR__ . '/../includes/auth_guard.php';
 wajib_login('kios');
 require_once __DIR__ . '/../includes/saprotan_helper.php';
-require_once __DIR__ . '/../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     wajib_csrf('produk.php');
-    // TODO S18: DELETE ... WHERE id = ? AND user_id = ?; tolak bila produk sudah punya pesanan (RESTRICT).
-    aksi_mode_ui('Hapus produk', 'produk.php');
+    $id = (int) input_teks($_POST, 'id');
+    if ($id > 0) {
+        $cek = $koneksi->prepare(
+            'SELECT id FROM produk_saprotan WHERE id = ? AND user_id = ?'
+        );
+        $cek->bind_param('ii', $id, $_SESSION['user_id']);
+        $cek->execute();
+        if (!$cek->get_result()->fetch_assoc()) {
+            set_flash('error', 'Produk tidak ditemukan atau bukan milik kios Anda.');
+        } else {
+            $pakai = $koneksi->prepare(
+                'SELECT id FROM pesanan_saprotan WHERE produk_saprotan_id = ? LIMIT 1'
+            );
+            $pakai->bind_param('i', $id);
+            $pakai->execute();
+            if ($pakai->get_result()->fetch_assoc()) {
+                set_flash('error', 'Produk tidak dapat dihapus karena sudah memiliki riwayat pesanan.');
+            } else {
+                $hapus = $koneksi->prepare(
+                    'DELETE FROM produk_saprotan WHERE id = ? AND user_id = ?'
+                );
+                $hapus->bind_param('ii', $id, $_SESSION['user_id']);
+                $hapus->execute();
+                set_flash('success', 'Produk berhasil dihapus.');
+            }
+        }
+    }
+    redirect('produk.php');
 }
 
 $kategori = input_teks($_GET, 'kategori');
@@ -16,10 +42,19 @@ if (!isset(KATEGORI_SAPROTAN[$kategori])) {
     $kategori = '';
 }
 
-// TODO S18: SELECT * FROM produk_saprotan WHERE user_id = ? [AND kategori = ?]
-$produk = array_filter($dummy_produk, function ($p) use ($dummy_user_kios, $kategori) {
-    return $p['user_id'] === $dummy_user_kios && ($kategori === '' || $p['kategori'] === $kategori);
-});
+if ($kategori === '') {
+    $stmt = $koneksi->prepare(
+        'SELECT * FROM produk_saprotan WHERE user_id = ? ORDER BY created_at DESC, id DESC'
+    );
+    $stmt->bind_param('i', $_SESSION['user_id']);
+} else {
+    $stmt = $koneksi->prepare(
+        'SELECT * FROM produk_saprotan WHERE user_id = ? AND kategori = ? ORDER BY created_at DESC, id DESC'
+    );
+    $stmt->bind_param('is', $_SESSION['user_id'], $kategori);
+}
+$stmt->execute();
+$produk = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $judul_halaman = 'Produk Saya';
 $menu_aktif    = 'produk';

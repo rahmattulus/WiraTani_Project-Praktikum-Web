@@ -15,7 +15,7 @@ $semua_menu = [
         ['lelang',    'Lelang Panen', 'lelang/', '🌾'],
         ['erp',       'ERP Keuangan', 'erp/',       '💰'],
         ['musim',     'Musim Tanam',  'musim/',     '📅'],
-        ['saprotan',  'Saprotan',     'saprotan.php',  '🛒'],
+        ['saprotan',  'Saprotan',     'saprotan/',  '🛒'],
         ['lowongan',  'Lowongan',     'lowongan/', '👷'],
     ],
     'tengkulak' => [
