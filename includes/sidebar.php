@@ -19,12 +19,12 @@ $semua_menu = [
         ['lowongan',  'Lowongan',     'lowongan/index.php', '👷'],
     ],
     'tengkulak' => [
-        ['dashboard', 'Dashboard',       'dashboard.php', '📊'],
+        ['dashboard', 'Dashboard',       'index.php',     '📊'],
         ['pasar',     'Pasar Lelang',    'pasar.php',     '🏷️'],
         ['penawaran', 'Penawaran Saya',  'penawaran.php', '🤝'],
     ],
     'kios' => [
-        ['dashboard', 'Dashboard',      'dashboard.php', '📊'],
+        ['dashboard', 'Dashboard',      'index.php',     '📊'],
         ['produk',    'Produk',         'produk.php',    '📦'],
         ['pesanan',   'Pesanan Masuk',  'pesanan.php',   '📥'],
     ],
