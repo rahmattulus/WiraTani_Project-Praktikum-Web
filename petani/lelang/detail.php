@@ -1,5 +1,5 @@
 <?php
-/* Petani: detail lelang dan daftar tawaran (S10, S17). */
+/* Petani: detail lelang, penetapan pemenang, dan pembatalan (S10, S17, S24). */
 require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('petani');
 require_once __DIR__ . '/../../config/koneksi.php';
@@ -20,16 +20,7 @@ try {
     }
 
     $penawaran_hasil = ambil_penawaran_hasil_panen($koneksi, $id);
-    $stmt = $koneksi->prepare(
-        "SELECT id, nama_musim, komoditas
-         FROM musim_tanam
-         WHERE user_id = ? AND status = 'berjalan'
-         ORDER BY tanggal_mulai DESC, id DESC"
-    );
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $musim_berjalan = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
+    $musim_berjalan = ambil_musim_tanam_berjalan($koneksi, $user_id);
 } catch (mysqli_sql_exception $exception) {
     error_log('Gagal memuat detail lelang petani: ' . $exception->getMessage());
     $database_error = 'Detail lelang gagal dimuat. Silakan muat ulang halaman.';
@@ -39,7 +30,48 @@ $boleh_ubah = $hasil && $hasil['status'] === 'aktif' && (int) $hasil['jumlah_taw
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $database_error === '') {
     wajib_csrf('detail.php?id=' . $id);
-    set_flash('info', 'Penetapan pemenang dikerjakan pada tahap S24.');
+    $aksi = input_teks($_POST, 'aksi');
+    if ($aksi === 'pilih_pemenang') {
+        $penawaran_id_input = input_teks($_POST, 'id');
+        $musim_tanam_id_input = input_teks($_POST, 'musim_tanam_id');
+        if (!ctype_digit($penawaran_id_input) || (int) $penawaran_id_input < 1
+            || !ctype_digit($musim_tanam_id_input) || (int) $musim_tanam_id_input < 1) {
+            set_flash('error', 'Pilih tawaran dan musim tanam yang valid.');
+            redirect('detail.php?id=' . $id);
+        }
+
+        $hasil_pilih = tetapkan_pemenang_lelang(
+            $koneksi,
+            $id,
+            $user_id,
+            (int) $penawaran_id_input,
+            (int) $musim_tanam_id_input
+        );
+        $pesan_pilih = [
+            'selected' => ['success', 'Pemenang lelang berhasil ditetapkan dan pendapatan dicatat.'],
+            'not_active' => ['error', 'Lelang sudah tidak aktif atau bukan milik Anda.'],
+            'invalid_offer' => ['error', 'Tawaran tidak ditemukan atau sudah tidak dapat dipilih.'],
+            'invalid_season' => ['error', 'Musim tanam tidak valid atau sudah selesai.'],
+            'amount_too_large' => ['error', 'Nilai pendapatan melebihi batas pencatatan keuangan.'],
+            'already_recorded' => ['error', 'Transaksi hasil lelang sudah pernah dicatat. Tidak ada perubahan yang disimpan.'],
+            'error' => ['error', 'Pemenang gagal ditetapkan. Tidak ada perubahan yang disimpan.'],
+        ][$hasil_pilih] ?? ['error', 'Pemenang gagal ditetapkan. Tidak ada perubahan yang disimpan.'];
+        set_flash($pesan_pilih[0], $pesan_pilih[1]);
+        redirect('detail.php?id=' . $id);
+    }
+
+    if ($aksi === 'batalkan') {
+        $hasil_batal = batalkan_lelang($koneksi, $id, $user_id);
+        $pesan_batal = [
+            'cancelled' => ['success', 'Lelang berhasil dibatalkan. Penawaran yang menunggu ditandai kalah.'],
+            'not_active' => ['error', 'Lelang sudah tidak aktif atau bukan milik Anda.'],
+            'error' => ['error', 'Lelang gagal dibatalkan. Tidak ada perubahan yang disimpan.'],
+        ][$hasil_batal] ?? ['error', 'Lelang gagal dibatalkan. Tidak ada perubahan yang disimpan.'];
+        set_flash($pesan_batal[0], $pesan_batal[1]);
+        redirect('detail.php?id=' . $id);
+    }
+
+    set_flash('error', 'Permintaan lelang tidak valid.');
     redirect('detail.php?id=' . $id);
 }
 
@@ -87,6 +119,14 @@ include __DIR__ . '/../../includes/sidebar.php';
             <a class="btn btn-ghost" href="<?= BASE_URL ?>/petani/lelang/index.php">Kembali ke daftar</a>
             <?php if ($boleh_ubah): ?>
               <a class="btn btn-primary" href="<?= BASE_URL ?>/petani/lelang/form.php?id=<?= (int) $hasil['id'] ?>">Ubah lelang</a>
+            <?php endif; ?>
+            <?php if ($hasil['status'] === 'aktif'): ?>
+              <form method="post" action=""
+                    data-confirm="Batalkan lelang ini? Semua tawaran yang menunggu akan ditandai kalah.">
+                <?= csrf_field() ?>
+                <input type="hidden" name="aksi" value="batalkan">
+                <button class="btn btn-danger" type="submit">Batalkan lelang</button>
+              </form>
             <?php endif; ?>
           </div>
         </section>
@@ -199,6 +239,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                   <form class="offer-winner-form" method="post" action="" data-winner-form
                         data-confirm="Tetapkan tawaran ini sebagai pemenang lelang?" hidden>
                     <?= csrf_field() ?>
+                    <input type="hidden" name="aksi" value="pilih_pemenang">
                     <input type="hidden" name="id" value="">
                     <div class="form-group">
                       <label for="modal_musim_tanam_id">Catat hasil lelang ke musim tanam</label>

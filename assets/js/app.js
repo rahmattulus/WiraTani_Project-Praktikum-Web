@@ -19,6 +19,81 @@
     });
   }
 
+  /* Dialog aplikasi untuk pesan dan konfirmasi, tanpa dialog bawaan browser. */
+  var appDialog = document.querySelector('[data-app-dialog]');
+  var appDialogTitle = appDialog && appDialog.querySelector('[data-dialog-title]');
+  var appDialogMessage = appDialog && appDialog.querySelector('[data-dialog-message]');
+  var appDialogIcon = appDialog && appDialog.querySelector('[data-dialog-icon]');
+  var appDialogCancel = appDialog && appDialog.querySelector('[data-dialog-cancel]');
+  var appDialogConfirm = appDialog && appDialog.querySelector('[data-dialog-confirm]');
+  var appDialogAction = null;
+
+  function closeAppDialog() {
+    if (appDialog && typeof appDialog.close === 'function' && appDialog.open) {
+      appDialog.close();
+    } else if (appDialog) {
+      appDialog.removeAttribute('open');
+    }
+  }
+
+  function showAppDialog(options) {
+    if (!appDialog) { return; }
+
+    appDialog.dataset.dialogKind = options.kind || 'info';
+    appDialogTitle.textContent = options.title;
+    appDialogMessage.textContent = options.message;
+    appDialogIcon.textContent = options.kind === 'error' ? '!' : (options.kind === 'confirm' ? '?' : 'i');
+    appDialogCancel.hidden = !options.cancelLabel;
+    if (options.cancelLabel) {
+      appDialogCancel.textContent = options.cancelLabel;
+    }
+    appDialogConfirm.textContent = options.confirmLabel || 'Oke';
+    appDialogAction = options.onConfirm || null;
+
+    if (typeof appDialog.showModal === 'function') {
+      if (!appDialog.open) {
+        appDialog.showModal();
+      }
+    } else {
+      appDialog.setAttribute('open', '');
+    }
+    appDialogConfirm.focus();
+  }
+
+  if (appDialog) {
+    appDialogConfirm.addEventListener('click', function () {
+      var action = appDialogAction;
+      appDialogAction = null;
+      closeAppDialog();
+      if (action) { action(); }
+    });
+
+    appDialogCancel.addEventListener('click', function () {
+      appDialogAction = null;
+      closeAppDialog();
+    });
+
+    appDialog.addEventListener('cancel', function () {
+      appDialogAction = null;
+    });
+
+    appDialog.addEventListener('click', function (ev) {
+      if (ev.target === appDialog) {
+        appDialogAction = null;
+        closeAppDialog();
+      }
+    });
+
+    var popupNotice = document.querySelector('[data-app-notice]');
+    if (popupNotice) {
+      showAppDialog({
+        kind: popupNotice.getAttribute('data-notice-kind'),
+        title: popupNotice.getAttribute('data-notice-title'),
+        message: popupNotice.getAttribute('data-notice-message')
+      });
+    }
+  }
+
   /* Modal detail tawaran dan pemilihan pemenang lelang */
   var offerDialog = document.querySelector('[data-offer-dialog]');
   if (offerDialog) {
@@ -86,12 +161,38 @@
     });
   }
 
-  /* Konfirmasi aksi permanen: <form data-confirm="Yakin ...?"> */
+  /* Konfirmasi aksi permanen memakai dialog aplikasi. */
   document.addEventListener('submit', function (ev) {
-    var pesan = ev.target.getAttribute('data-confirm');
-    if (pesan && !window.confirm(pesan)) {
-      ev.preventDefault();
+    var form = ev.target;
+    if (!(form instanceof HTMLFormElement)) { return; }
+    var pesan = form.getAttribute('data-confirm');
+    if (!pesan) { return; }
+    if (form.dataset.confirmBypass === 'true') {
+      delete form.dataset.confirmBypass;
+      return;
     }
+
+    ev.preventDefault();
+    var submitter = ev.submitter;
+    showAppDialog({
+      kind: 'confirm',
+      title: 'Konfirmasi tindakan',
+      message: pesan,
+      cancelLabel: 'Batal',
+      confirmLabel: 'Lanjutkan',
+      onConfirm: function () {
+        form.dataset.confirmBypass = 'true';
+        if (typeof form.requestSubmit === 'function') {
+          if (submitter) {
+            form.requestSubmit(submitter);
+          } else {
+            form.requestSubmit();
+          }
+        } else {
+          form.submit();
+        }
+      }
+    });
   });
 
   /* Flash message: klik untuk menutup */
