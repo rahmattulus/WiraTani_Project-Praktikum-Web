@@ -62,7 +62,8 @@ function tampil_flash(): void
 function tampil_error(array $error, string $field): void
 {
     if (isset($error[$field])) {
-        echo '<p class="form-error">' . e($error[$field]) . '</p>';
+        echo '<p class="form-error" id="error-' . e($field) . '" role="alert">'
+            . e($error[$field]) . '</p>';
     }
 }
 

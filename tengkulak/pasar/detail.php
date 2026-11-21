@@ -1,36 +1,26 @@
 <?php
-/* Tengkulak: detail hasil panen dan ringkasan penawaran (S11). */
+/* Tengkulak: detail hasil panen dan ringkasan penawaran (S11, S20). */
 require_once __DIR__ . '/../../includes/auth_guard.php';
 wajib_login('tengkulak');
-require_once __DIR__ . '/../../includes/dummy_lelang.php';
+require_once __DIR__ . '/../../config/koneksi.php';
+require_once __DIR__ . '/../../includes/lelang_helper.php';
 
 $id = (int) input_teks($_GET, 'id');
-$hasil = null;
-foreach ($dummy_hasil_panen as $item) {
-    if ($item['id'] === $id && $item['status'] === 'aktif') {
-        $hasil = $item;
-        break;
+$user_id = user_id_login();
+$database_error = '';
+try {
+    $hasil = ambil_detail_pasar_lelang($koneksi, $id);
+    if (!$hasil) {
+        set_flash('error', 'Lelang aktif tidak ditemukan.');
+        redirect('index.php');
     }
+    $tawaran_saya = ambil_penawaran_tengkulak($koneksi, $id, $user_id);
+} catch (mysqli_sql_exception $exception) {
+    error_log('Gagal memuat detail pasar lelang: ' . $exception->getMessage());
+    $database_error = 'Detail lelang gagal dimuat. Silakan muat ulang halaman.';
+    $hasil = null;
+    $tawaran_saya = [];
 }
-
-if (!$hasil) {
-    set_flash('error', 'Lelang aktif tidak ditemukan.');
-    redirect('index.php');
-}
-
-$tawaran_hasil = array_values(array_filter($dummy_penawaran_lelang, function ($penawaran) use ($id) {
-    return $penawaran['hasil_panen_id'] === $id;
-}));
-usort($tawaran_hasil, function ($a, $b) {
-    return $b['harga_tawar'] <=> $a['harga_tawar'];
-});
-$tawaran_tertinggi = $tawaran_hasil[0] ?? null;
-$tawaran_saya = array_values(array_filter($tawaran_hasil, function ($penawaran) {
-    return $penawaran['user_id'] === user_id_login();
-}));
-usort($tawaran_saya, function ($a, $b) {
-    return strcmp($b['created_at'], $a['created_at']);
-});
 
 $judul_halaman = 'Detail Lelang';
 $menu_aktif = 'pasar';
@@ -38,6 +28,9 @@ include __DIR__ . '/../../includes/header.php';
 include __DIR__ . '/../../includes/sidebar.php';
 ?>
       <div class="dash">
+        <?php if ($database_error !== ''): ?>
+          <div class="alert alert-error" role="alert"><?= e($database_error) ?></div>
+        <?php else: ?>
         <section class="card">
           <div class="card-head">
             <h2 class="card-title"><?= e($hasil['komoditas']) ?></h2>
@@ -49,7 +42,7 @@ include __DIR__ . '/../../includes/sidebar.php';
           <div class="form-grid">
             <div class="form-group">
               <span class="text-muted">Petani</span>
-              <strong><?= e($dummy_nama_petani[$hasil['user_id']] ?? 'Petani') ?></strong>
+              <strong><?= e($hasil['nama_petani']) ?></strong>
             </div>
             <div class="form-group">
               <span class="text-muted">Lokasi panen</span>
@@ -69,11 +62,11 @@ include __DIR__ . '/../../includes/sidebar.php';
             </div>
             <div class="form-group">
               <span class="text-muted">Jumlah tawaran</span>
-              <strong><?= count($tawaran_hasil) ?></strong>
+              <strong><?= (int) $hasil['jumlah_tawaran'] ?></strong>
             </div>
           </div>
 
-          <?php if ($hasil['deskripsi'] !== ''): ?>
+          <?php if ($hasil['deskripsi'] !== null && $hasil['deskripsi'] !== ''): ?>
             <p><?= nl2br(e($hasil['deskripsi'])) ?></p>
           <?php endif; ?>
 
@@ -88,8 +81,8 @@ include __DIR__ . '/../../includes/sidebar.php';
 
         <section class="card-dark">
           <h2 class="card-title">Tawaran tertinggi saat ini</h2>
-          <?php if ($tawaran_tertinggi): ?>
-            <p class="stat-value"><?= e(format_rupiah($tawaran_tertinggi['harga_tawar'])) ?><span class="stat-unit">/kg</span></p>
+          <?php if ($hasil['tawaran_tertinggi'] !== null): ?>
+            <p class="stat-value"><?= e(format_rupiah($hasil['tawaran_tertinggi'])) ?><span class="stat-unit">/kg</span></p>
           <?php else: ?>
             <p>Belum ada tawaran. Jadilah yang pertama mengajukan harga.</p>
           <?php endif; ?>
@@ -134,5 +127,6 @@ include __DIR__ . '/../../includes/sidebar.php';
             </div>
           <?php endif; ?>
         </section>
+        <?php endif; ?>
       </div>
 <?php include __DIR__ . '/../../includes/footer.php'; ?>
