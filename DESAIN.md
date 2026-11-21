@@ -1,8 +1,17 @@
-# DESAIN: Pedoman Tampilan UI Platform Web Pertanian
+# DESAIN: Pedoman Tampilan UI Platform Web Pertanian (WiraTani)
 
-Patokan dan konteks tampilan untuk seluruh halaman. Referensi visual: dashboard bergaya **soft glass** berwarna teal dengan sidebar kiri, kartu membulat, dan banner ajakan di sudut kanan bawah (gambar referensi "CoachPro").
+Patokan dan konteks tampilan untuk seluruh halaman. Arah desain: **hijau hutan futuristik yang tetap sederhana dan bernuansa pertanian**.
 
-> **Batasan native (wajib):** semua gaya ditulis sendiri di `assets/css/style.css`. Tanpa Tailwind, Bootstrap, font eksternal, ikon library, atau gambar 3D dari luar. Lihat `PRD-web-pertanian.md` bagian 9.
+Referensi:
+- Tata letak: dashboard dengan sidebar kiri dan kartu-kartu bergaya kaca (glass).
+- Warna dan karakter: dashboard dengan sidebar hijau gelap, kartu terang, aksen hijau segar, dan banner CTA hijau.
+
+> **Batasan native (wajib):** semua gaya ditulis sendiri di `assets/css/style.css`. Tanpa Tailwind, Bootstrap, font eksternal, ikon library, atau gambar dari luar. Lihat `PRD-web-pertanian.md` bagian 9.
+
+**Revisi dari versi sebelumnya:**
+1. Dashboard sekarang **layar penuh (full-bleed)**: tidak ada bingkai membulat, margin, atau efek kaca pada kerangka utama.
+2. **Sudut membulat dan efek kaca hanya dipakai pada komponen kartu.**
+3. Palet diganti dari teal-lavender menjadi **palet pertanian** (hijau hutan, hijau segar, kuning padi, tanah, air).
 
 ---
 
@@ -10,74 +19,125 @@ Patokan dan konteks tampilan untuk seluruh halaman. Referensi visual: dashboard 
 
 | Ciri | Penerapan |
 |---|---|
-| Latar | Gradasi lembut teal keabu-abuan dengan semburat lavender di sudut kanan atas |
-| Bingkai aplikasi | Satu panel besar membulat, semi-transparan (efek kaca) di atas latar |
-| Kartu | Permukaan terang kehijauan, sudut besar, bayangan lembut ala *soft UI* |
-| Aksen | Teal sebagai warna utama; pink/merah muda untuk penanda kontras |
-| Menu aktif | Pil berwarna teal dengan teks putih |
-| Tipografi | Judul besar dan tebal berwarna hijau tua; label kecil kapital berwarna abu |
-| Kesan | Tenang, bersih, lega (banyak ruang kosong), mudah dipindai |
+| Kerangka | Penuh satu layar: sidebar hijau gelap setinggi layar di kiri, area konten di kanan. Sudut kerangka tegas (tanpa radius) |
+| Area konten | Gradasi mint terang dengan dua semburat cahaya buram (hijau segar dan biru air) supaya kartu kaca terlihat |
+| Kartu | Satu-satunya elemen yang membulat (20px) dan bergaya kaca: putih transparan, blur latar, garis tepi terang, bayangan hijau lembut |
+| Sidebar | Hijau hutan gelap bergradasi; menu aktif diberi penanda hijau segar yang sedikit menyala (glow) |
+| Aksen | Hijau segar sebagai warna aksi utama; kuning padi dan tanah (terakota) sebagai pendamping |
+| Sentuhan futuristik (secukupnya) | Glow hijau pada elemen aktif, progress berbentuk cincin, mini grafik batang, angka dengan lebar seragam, label kecil huruf kapital |
+| Kesan | Bersih, tenang, modern, dan terasa "tanaman": hijau, tanah, air, matahari |
 
-## 2. Design Token
+Prinsip komposisi warna (60-30-10):
+- **60%** permukaan terang (latar mint dan kartu putih transparan)
+- **30%** hijau hutan gelap (sidebar, teks judul, kartu sorotan)
+- **10%** aksen (hijau segar, kuning padi, terakota, biru air)
 
-Salin blok ini ke bagian atas `assets/css/style.css`. Semua warna, jarak, dan bayangan wajib memakai variabel, bukan nilai tetap di halaman.
+## 2. Palet Warna
 
-Nilai warna di bawah diambil dari sampel gambar referensi, lalu disesuaikan untuk keterbacaan.
+Nilai hijau gelap dan hijau segar diambil dari sampel gambar referensi, lalu dilengkapi warna pertanian.
+
+### 2.1 Inti
+
+| Peran | Nama | Hex | Dipakai untuk |
+|---|---|---|---|
+| Hijau hutan gelap | `--forest-900` | `#0a3639` | Sidebar, judul, kartu sorotan gelap |
+| Hijau hutan lebih gelap | `--forest-950` | `#052124` | Dasar gradasi sidebar, tombol gelap, kartu sorotan |
+| Hijau hutan sedang | `--forest-800` | `#094345` | Gradasi sidebar |
+| Hijau zamrud | `--emerald-800` | `#0b5846` | Banner CTA (gradasi) |
+| Hijau segar | `--green-500` | `#43d980` | Aksen utama, tombol utama, ikon aktif, glow |
+| Hijau tua untuk teks | `--green-800` | `#0f6b3e` | Tautan dan teks aksen di atas latar terang |
+| Hijau limau | `--lime-400` | `#c6f36b` | Highlight kecil dan glow (dipakai hemat) |
+
+### 2.2 Pendamping bertema pertanian
+
+| Peran | Nama | Hex | Makna |
+|---|---|---|---|
+| Kuning padi | `--grain-400` | `#f2b84b` | Panen, peringatan ringan, status menunggu |
+| Terakota (tanah) | `--soil-500` | `#e2672e` | Penurunan, rugi, bahaya, hapus/batal |
+| Biru air | `--water-400` | `#4cc9f0` | Informasi, irigasi, status aktif |
+
+### 2.3 Netral
+
+| Peran | Nama | Hex |
+|---|---|---|
+| Latar mint (atas) | `--mint-50` | `#f4fbf8` |
+| Latar mint (bawah) | `--mint-100` | `#e6f4ef` |
+| Teks utama | `--ink` | `#08282a` |
+| Teks sekunder | `--ink-soft` | `#3d5c5a` |
+| Teks redup / label | `--muted` | `#6f8c8a` |
+| Garis | `--line` | `rgba(10, 54, 57, 0.12)` |
+
+### 2.4 Teks di atas sidebar gelap
+
+| Peran | Hex |
+|---|---|
+| Menu biasa | `#bfe0d6` |
+| Menu aktif | `#ffffff` |
+| Label bagian ("NAVIGASI") | `#6fa39a` |
+
+### 2.5 Aturan kontras
+- Teks isi memakai `--ink`; jangan memakai hijau segar untuk teks di atas latar terang (kontras rendah).
+- Di atas tombol hijau segar, teks memakai warna gelap `--forest-950` (bukan putih).
+- Di atas latar gelap (sidebar, kartu sorotan), teks putih atau `#bfe0d6`.
+- Status tidak boleh hanya dibedakan warna: selalu sertakan teks ("Aktif", "Selesai").
+
+## 3. Design Token
+
+Salin ke bagian atas `assets/css/style.css`. Semua warna, jarak, dan bayangan wajib memakai variabel.
 
 ```css
 :root {
-  /* Latar */
-  --bg-teal:      #adcfd1;
-  --bg-lavender:  #adb6d7;
-  --bg-light:     #d2e4e6;
+  /* Hijau hutan */
+  --forest-950: #052124;
+  --forest-900: #0a3639;
+  --forest-800: #094345;
+  --emerald-800:#0b5846;
 
-  /* Permukaan */
-  --frame:        rgba(255, 255, 255, 0.30);
-  --frame-line:   rgba(255, 255, 255, 0.65);
-  --surface:      #dbe9ea;
-  --surface-soft: #e6f1f2;
-  --surface-hover:#d2e4e6;
+  /* Hijau aksen */
+  --green-500: #43d980;
+  --green-600: #2cb866;
+  --green-800: #0f6b3e;
+  --lime-400:  #c6f36b;
 
-  /* Warna utama (teal) */
-  --primary:        #17869a;
-  --primary-dark:   #0d6f7d;
-  --primary-deep:   #116661;
-  --primary-soft:   #cfe6e8;
-  --primary-gradient: linear-gradient(135deg, #17869a 0%, #1f9aa3 100%);
-  --banner-gradient:  linear-gradient(135deg, #0d6f7d 0%, #1b9aa5 100%);
+  /* Pendamping pertanian */
+  --grain-400: #f2b84b;
+  --soil-500:  #e2672e;
+  --water-400: #4cc9f0;
 
-  /* Teks */
-  --ink:       #0f2e25;   /* judul dan isi utama */
-  --ink-soft:  #3f5c58;   /* teks sekunder */
-  --muted:     #6f8a8a;   /* label kecil, placeholder */
-  --on-primary:#ffffff;
+  /* Netral */
+  --mint-50:   #f4fbf8;
+  --mint-100:  #e6f4ef;
+  --ink:       #08282a;
+  --ink-soft:  #3d5c5a;
+  --muted:     #6f8c8a;
+  --line:      rgba(10, 54, 57, 0.12);
 
-  /* Garis */
-  --line: rgba(15, 46, 37, 0.12);
+  /* Status */
+  --success: #1fa35c;
+  --warning: #d99a1f;
+  --danger:  #d9522a;
+  --info:    #1b9cc4;
 
-  /* Aksen dan status */
-  --accent:   #f27c8a;    /* pink, penanda kontras */
-  --success:  #2f9e77;
-  --warning:  #e9a23b;
-  --danger:   #e5566a;
-  --info:     #17869a;
+  /* Sidebar */
+  --nav-text:   #bfe0d6;
+  --nav-label:  #6fa39a;
+  --nav-active-bg: rgba(67, 217, 128, 0.14);
 
-  /* Warna ikon pada kartu statistik */
-  --tile-violet: #8f7cf0;
-  --tile-pink:   #f06fa6;
-  --tile-orange: #f5a24a;
-  --tile-teal:   #2f9aa3;
+  /* Kartu kaca */
+  --glass-bg:     rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.80);
+  --glass-solid:  #f3faf7;  /* cadangan tanpa blur */
+  --shadow-card:  0 8px 30px rgba(10, 54, 57, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-card-hover: 0 12px 36px rgba(10, 54, 57, 0.14),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --glow-green:   0 0 14px rgba(67, 217, 128, 0.55);
+  --shadow-btn:   0 6px 18px rgba(67, 217, 128, 0.35);
 
-  /* Bentuk */
-  --radius-frame: 28px;
-  --radius-card:  20px;
-  --radius-pill:  14px;
-  --radius-icon:  12px;
-
-  /* Bayangan lembut (soft UI) */
-  --shadow-card: 6px 6px 16px rgba(60, 100, 110, 0.14),
-                -4px -4px 12px rgba(255, 255, 255, 0.55);
-  --shadow-pill: 0 6px 14px rgba(23, 134, 154, 0.35);
+  /* Bentuk: radius HANYA untuk komponen, bukan kerangka */
+  --radius-card: 20px;
+  --radius-ctrl: 12px;
+  --radius-pill: 999px;
 
   /* Jarak (kelipatan 4) */
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
@@ -85,312 +145,367 @@ Nilai warna di bawah diambil dari sampel gambar referensi, lalu disesuaikan untu
 
   /* Tipografi: font sistem, tanpa memuat dari luar */
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --fs-title: clamp(1.75rem, 1.2rem + 2.2vw, 2.5rem);  /* judul halaman */
-  --fs-h2:    1.0625rem;                               /* judul kartu */
-  --fs-stat:  clamp(1.5rem, 1.1rem + 1.4vw, 2rem);     /* angka statistik */
+  --fs-title: clamp(1.75rem, 1.2rem + 2.2vw, 2.5rem);
+  --fs-h2:    1.0625rem;
+  --fs-stat:  clamp(1.5rem, 1.1rem + 1.4vw, 2.125rem);
   --fs-body:  0.9375rem;
   --fs-small: 0.8125rem;
-  --fs-label: 0.6875rem;                               /* label kapital */
+  --fs-label: 0.6875rem;
 }
-```
 
-### Latar halaman
+*, *::before, *::after { box-sizing: border-box; }
 
-```css
 body {
   margin: 0;
   font-family: var(--font);
   font-size: var(--fs-body);
   color: var(--ink);
-  background:
-    radial-gradient(circle at 95% 8%,  var(--bg-lavender) 0, transparent 45%),
-    radial-gradient(circle at 0% 100%, var(--bg-light)    0, transparent 50%),
-    var(--bg-teal);
-  background-attachment: fixed;
-  min-height: 100vh;
+  background: var(--mint-50);
 }
 ```
 
-### Aturan warna dan keterbacaan
-- Isi teks memakai `--ink`. Jangan memakai teal untuk paragraf panjang.
-- Teal (`--primary-dark`) dipakai untuk tautan, label menu, dan tombol; ukuran minimal 14px dan tebal sedang.
-- Teks di atas pil/tombol teal selalu putih (`--on-primary`).
-- Status tidak boleh hanya dibedakan warna: selalu sertakan teks (mis. "Aktif", "Selesai").
-
-## 3. Tipografi
+## 4. Tipografi
 
 | Elemen | Gaya |
 |---|---|
-| Sapaan ("Selamat datang kembali, ...") | `--fs-small`, `--primary-dark`, tebal sedang |
-| Judul halaman (Dashboard) | `--fs-title`, berat 600, `--ink` |
+| Sapaan kecil di atas judul | `--fs-small`, `--green-800`, berat 600 |
+| Judul halaman | `--fs-title`, berat 700, `--ink`, `letter-spacing: -0.01em` |
 | Judul kartu | `--fs-h2`, berat 600 |
-| Tautan kartu ("Lihat semua") | `--fs-small`, `--primary-dark`, rata kanan |
-| Label statistik | `--fs-label`, huruf kapital, `letter-spacing: .06em`, `--muted` |
-| Angka statistik | `--fs-stat`, berat 500, `--ink`; satuan (Rp, kg) lebih kecil |
-| Header tabel | `--fs-label`, kapital, `--muted` |
+| Tautan kartu ("Lihat semua") | `--fs-small`, `--green-800`, berat 600 |
+| Label statistik / header tabel | `--fs-label`, kapital, `letter-spacing: .06em`, `--muted` |
+| Angka statistik | `--fs-stat`, berat 600, `font-variant-numeric: tabular-nums`; satuan (Rp, kg, %) lebih kecil dan `--muted` |
 
 Font memakai font sistem, jadi tampilan sedikit berbeda di tiap perangkat. Ini disengaja demi batasan native.
 
-## 4. Kerangka Layout (App Shell)
+## 5. Kerangka Layout (Full-Bleed)
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│ ┌──────────┬────────────────────────────────────────────────┐ │
-│ │ LOGO     │  Selamat datang kembali, Budi 👋   🔍  🔔  (B) │ │
-│ │          │  Dashboard                                     │ │
-│ │ ▣ Dash   │ ────────────────────────────────────────────── │ │
-│ │   Lelang │                                                │ │
-│ │   ERP    │             area konten (grid kartu)           │ │
-│ │   ...    │                                                │ │
-│ └──────────┴────────────────────────────────────────────────┘ │
-└───────────────────────────────────────────────────────────────┘
-        bingkai kaca membulat di atas latar gradasi
+┌──────────────┬─────────────────────────────────────────────────┐
+│ ▓▓▓▓▓▓▓▓▓▓▓▓ │  Selamat datang kembali, Rahmat        🔔 (R)   │
+│ ▓ WiraTani ▓ │  Dashboard Petani                               │
+│ ▓▓▓▓▓▓▓▓▓▓▓▓ │ ───────────────────────────────────────────────  │
+│ ▓ ● Dash   ▓ │  ╭───────╮ ╭───────╮ ╭───────╮                  │
+│ ▓   Lelang ▓ │  │ kartu │ │ kartu │ │ kartu │  ← hanya kartu   │
+│ ▓   ERP    ▓ │  ╰───────╯ ╰───────╯ ╰───────╯    yang membulat │
+│ ▓   ...    ▓ │  ╭───────────────╮ ╭───────────╮                │
+│ ▓▓▓▓▓▓▓▓▓▓▓▓ │  │     kartu     │ │   kartu   │                │
+│ ▓ Keluar   ▓ │  ╰───────────────╯ ╰───────────╯                │
+└──────────────┴─────────────────────────────────────────────────┘
+ sidebar gelap,                 area konten terang,
+ sudut tegas, setinggi layar    mengisi sisa layar sampai tepi
 ```
 
 | Bagian | Spesifikasi |
 |---|---|
-| Bingkai `.app` | Lebar maks 1280px, di tengah, margin 24px, `border-radius: var(--radius-frame)`, latar `--frame`, `backdrop-filter: blur(14px)`, garis `--frame-line` |
-| Sidebar `.sidebar` | Lebar 240px, garis pemisah kanan, logo di atas, menu vertikal, menu sekunder dipisah garis |
-| Topbar `.topbar` | Sapaan + judul di kiri; pencarian (opsional), ikon notifikasi, avatar inisial + nama di kanan |
-| Konten `.content` | Padding 24px sampai 32px, berisi grid kartu |
+| `.app` | `min-height: 100vh`, grid dua kolom (sidebar + konten), **tanpa margin, tanpa radius, tanpa border, tanpa blur** |
+| `.sidebar` | Lebar 250px, `position: sticky; top: 0; height: 100vh`, gradasi hijau hutan, bisa discroll bila menu panjang |
+| `.main` | Latar gradasi mint dengan dua semburat cahaya, mengisi seluruh sisa layar |
+| `.topbar` | Datar (tanpa kartu, tanpa kaca), garis tipis di bawah; sapaan + judul kiri, notifikasi dan avatar kanan |
+| `.content` | Padding 24px sampai 32px; lebar penuh (batas `max-width: 1600px` di layar sangat lebar, rata kiri) |
 
 ```css
-.app {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  max-width: 1280px;
-  margin: var(--space-6) auto;
-  border-radius: var(--radius-frame);
-  background: var(--frame);
-  border: 1px solid var(--frame-line);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  overflow: hidden;
+.app { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  display: flex; flex-direction: column;
+  padding: var(--space-6) var(--space-4);
+  color: var(--nav-text);
+  background: linear-gradient(180deg, var(--forest-900) 0%, var(--forest-800) 55%, var(--forest-950) 100%);
 }
+
+.main {
+  min-height: 100vh;
+  background:
+    radial-gradient(600px 420px at 92% 0%,  rgba(67, 217, 128, 0.20), transparent 70%),
+    radial-gradient(520px 420px at 0% 100%, rgba(76, 201, 240, 0.16), transparent 70%),
+    linear-gradient(180deg, var(--mint-50), var(--mint-100));
+  background-attachment: fixed;
+}
+
+.topbar  { display: flex; justify-content: space-between; align-items: center;
+           padding: var(--space-6) var(--space-8) var(--space-4);
+           border-bottom: 1px solid var(--line); }
+.content { padding: var(--space-6) var(--space-8) var(--space-10); max-width: 1600px; }
 ```
 
-> Cadangan bila `backdrop-filter` tidak didukung: tambahkan `@supports not (backdrop-filter: blur(1px)) { .app { background: rgba(230,241,242,.85); } }`.
+> Kerangka (`.app`, `.sidebar`, `.main`, `.topbar`) **dilarang** memakai `border-radius`, `backdrop-filter`, atau bayangan besar. Efek tersebut hanya untuk komponen kartu.
 
-## 5. Komponen
+## 6. Komponen
 
-Nama kelas di bawah adalah **kontrak bersama**. Rahmat dan Marvian memakai kelas ini saat membuat halaman, dan komponen baru ditambahkan oleh Agung ke `style.css`.
+Nama kelas di bawah adalah **kontrak bersama**. Rahmat dan Marvian memakai kelas ini saat membuat halaman; komponen baru ditambahkan oleh Agung.
 
-### 5.1 Sidebar dan menu
+### 6.1 Sidebar dan menu
 
 | Kelas | Keterangan |
 |---|---|
-| `.sidebar` | Wadah menu |
-| `.brand` | Logo teks di atas (nama aplikasi, tebal) |
-| `.nav-item` | Satu menu: ikon 20px + teks `--primary-dark`, tinggi 44px, padding horizontal 16px |
-| `.nav-item.active` | Pil `--primary-gradient`, teks putih, `--shadow-pill`, `--radius-pill` |
-| `.nav-divider` | Garis pemisah menu utama dan menu sekunder |
+| `.brand` | Logo daun (SVG inline) + nama "WiraTani" putih, tebal |
+| `.nav-label` | Label bagian kecil kapital (`--nav-label`), mis. "NAVIGASI" |
+| `.nav-item` | Tinggi 44px, padding 0 14px, radius 12px, teks `--nav-text`, ikon SVG monoline 20px |
+| `.nav-item:hover` | Latar `rgba(255,255,255,.06)`, teks putih |
+| `.nav-item.active` | Latar `--nav-active-bg`, teks putih, ikon `--green-500`, garis kiri 3px `--green-500` dengan `--glow-green` |
+| `.nav-divider` | Garis `rgba(255,255,255,.10)` pemisah menu utama dan sekunder (Keluar) |
 
-Menu per role:
+Radius 12px pada `.nav-item` termasuk komponen, jadi boleh. Menu per role:
 
 | Role | Menu utama | Menu sekunder |
 |---|---|---|
-| Petani | Dashboard, Lelang Panen, ERP Keuangan, Musim Tanam, Saprotan, Lowongan | Profil, Keluar |
-| Tengkulak | Dashboard, Pasar Lelang, Penawaran Saya | Profil, Keluar |
-| Kios | Dashboard, Produk, Pesanan Masuk | Profil, Keluar |
-| Publik | (tanpa sidebar) bar atas sederhana: Beranda, Bursa Kerja, Masuk | |
+| Petani | Dashboard, Lelang Panen, ERP Keuangan, Musim Tanam, Saprotan, Lowongan | Keluar |
+| Tengkulak | Dashboard, Pasar Lelang, Penawaran Saya | Keluar |
+| Kios | Dashboard, Produk, Pesanan Masuk | Keluar |
+| Publik | Tanpa sidebar: bar atas datar (logo, Beranda, Bursa Kerja, Masuk) | |
 
-### 5.2 Kartu
+### 6.2 Kartu kaca (komponen utama)
 
 ```css
 .card {
-  background: var(--surface);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
   padding: var(--space-5) var(--space-6);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card { background: var(--glass-solid); }
+}
+
+.card-head  { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
 .card-title { font-size: var(--fs-h2); font-weight: 600; margin: 0; }
-.card-link  { font-size: var(--fs-small); color: var(--primary-dark); text-decoration: none; }
+.card-link  { font-size: var(--fs-small); font-weight: 600; color: var(--green-800); text-decoration: none; }
 ```
 
-### 5.3 Kartu statistik
+**Kartu sorotan gelap** (`.card-dark`): latar `--forest-950`, teks putih, tanpa blur, radius sama. Dipakai untuk satu info terpenting di halaman, mis. "Tawaran tertinggi saat ini".
 
-Ikon dalam kotak berwarna di kiri atas, label kapital, lalu angka besar.
+### 6.3 Kartu statistik dengan mini grafik
 
 ```
-┌───────────────────────┐
-│ [▣]  TOTAL PENDAPATAN │
-│      Rp 12.4 jt       │
-└───────────────────────┘
+┌───────────────────────────────┐
+│ PENDAPATAN MUSIM INI          │
+│ Rp 12,4 jt            ▂ ▄ ▃ ▆ │
+│ Musim Tanam 1 2026            │
+└───────────────────────────────┘
 ```
 
 | Kelas | Keterangan |
 |---|---|
-| `.stat` | Kartu kecil, padding 16px |
-| `.stat-icon` | Kotak 44px, `--radius-icon`, latar warna `--tile-*`, ikon SVG putih |
+| `.stat` | Kartu kaca kecil |
 | `.stat-label` | `--fs-label`, kapital, `--muted` |
-| `.stat-value` | `--fs-stat`, `--ink` |
+| `.stat-value` | `--fs-stat`, tabular-nums |
+| `.stat-sub` | `--fs-small`, `--muted` (mis. nama musim tanam) |
+| `.spark` | Mini grafik batang dari `<i>` berisi tinggi relatif (tanpa library grafik) |
+| `.stat-up` / `.stat-down` | Warna `--success` / `--soil-500` untuk laba positif / rugi |
 
-### 5.4 Progress bar bertingkat (ringkasan lelang)
+```css
+.spark   { display: flex; align-items: flex-end; gap: 4px; height: 36px; }
+.spark i { width: 6px; height: calc(var(--h) * 1%); border-radius: 3px; background: var(--green-500); }
+.stat-down .spark i { background: var(--soil-500); }
+```
 
-Satu batang dibagi tiga segmen sesuai status, dengan angka di bawahnya.
+Tinggi batang diisi PHP lewat `style="--h:60"` (nilai dinamis, diperbolehkan).
+
+### 6.4 Progress cincin (gauge)
+
+Pengganti grafik pai, dibuat dengan `conic-gradient` (CSS murni).
+
+```css
+.ring {
+  --p: 0;                      /* persen, diisi PHP: style="--p:72" */
+  position: relative; width: 120px; aspect-ratio: 1; border-radius: 50%;
+  background: conic-gradient(var(--green-500) calc(var(--p) * 1%), rgba(10, 54, 57, 0.10) 0);
+  display: grid; place-items: center;
+}
+.ring::after {
+  content: attr(data-label);   /* mis. "72%" */
+  width: 78%; aspect-ratio: 1; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--glass-solid); font-size: 1.5rem; font-weight: 600;
+}
+```
+
+### 6.5 Progress batang bertingkat (ringkasan lelang)
 
 | Segmen | Warna |
 |---|---|
-| Aktif | `--primary` |
-| Selesai | `--success` |
-| Dibatalkan | `--accent` |
+| Aktif | `--water-400` |
+| Selesai | `--green-500` |
+| Dibatalkan | `--soil-500` |
 
-Lebar segmen dihitung PHP sebagai persen (`style="width: 60%"`), tanpa library grafik.
+Lebar segmen dihitung PHP sebagai persen.
 
-### 5.5 Tabel
+### 6.6 Tabel
 
 | Kelas | Keterangan |
 |---|---|
-| `.table` | Tanpa garis vertikal, hanya garis horizontal tipis `--line` |
+| `.table` | Hanya garis horizontal tipis `--line`, tanpa garis vertikal |
 | `.table th` | Label kapital kecil `--muted` |
-| `.table td` | Tinggi baris ±52px, baris pertama/terbaik boleh tebal |
-| `.table-wrap` | Pembungkus `overflow-x: auto` untuk layar sempit |
+| `.table td` | Tinggi baris ±52px; baris terbaik/teratas boleh tebal |
+| `.table-wrap` | Pembungkus `overflow-x: auto` |
 
-### 5.6 Badge status
+### 6.7 Badge status
 
-Pil kecil, teks tebal 12px, latar warna status 15 persen dengan teks warna status gelap.
+Pil kecil (`--radius-pill`), teks tebal 12px, latar warna status 15 persen, teks warna status yang lebih gelap.
 
 | Data | Status → kelas badge |
 |---|---|
-| Lelang | `aktif` → `.badge-info`, `selesai` → `.badge-success`, `dibatalkan` → `.badge-danger` |
-| Penawaran | `menunggu` → `.badge-warning`, `menang` → `.badge-success`, `kalah` → `.badge-muted` |
+| Lelang | `aktif` → `.badge-info` (air), `selesai` → `.badge-success` (hijau), `dibatalkan` → `.badge-danger` (terakota) |
+| Penawaran | `menunggu` → `.badge-warning` (padi), `menang` → `.badge-success`, `kalah` → `.badge-muted` |
 | Pesanan | `menunggu` → `.badge-warning`, `disetujui` → `.badge-info`, `selesai` → `.badge-success`, `ditolak` → `.badge-danger` |
 | Lowongan | `buka` → `.badge-success`, `ditutup` → `.badge-muted` |
 | Musim tanam | `berjalan` → `.badge-info`, `selesai` → `.badge-muted` |
 
-### 5.7 Tombol
+### 6.8 Tombol
 
 | Kelas | Gaya |
 |---|---|
-| `.btn` | Dasar: tinggi 44px, `--radius-pill`, padding 0 20px, berat 600 |
-| `.btn-primary` | `--primary-gradient`, teks putih |
-| `.btn-ghost` | Latar putih transparan, teks `--primary-dark`, garis `--line` |
-| `.btn-danger` | `--danger`, teks putih (hapus/batalkan) |
-| `.btn-sm` | Tinggi 36px, untuk aksi di dalam tabel |
+| `.btn` | Dasar: tinggi 44px, `--radius-ctrl`, padding 0 20px, berat 600 |
+| `.btn-primary` | Gradasi `--green-600` ke `--green-500`, **teks gelap `--forest-950`**, `--shadow-btn` |
+| `.btn-dark` | Latar `--forest-900`, teks putih |
+| `.btn-ghost` | Latar putih transparan, garis `--line`, teks `--forest-900` |
+| `.btn-danger` | Latar `--soil-500`, teks putih |
+| `.btn-sm` | Tinggi 36px, untuk aksi dalam tabel |
 
-Tombol aksi permanen (hapus, batalkan lelang, pilih pemenang) wajib meminta konfirmasi (`confirm()` JavaScript vanilla).
+Aksi permanen (hapus, batalkan lelang, pilih pemenang) wajib meminta konfirmasi `confirm()` (JavaScript vanilla).
 
-### 5.8 Banner ajakan (CTA)
+### 6.9 Banner ajakan (CTA)
 
-Kartu lebar dengan gradasi teal (`--banner-gradient`), teks putih, tombol putih, dan hiasan bentuk bulat/kapsul dari CSS murni (lingkaran hijau limau, cincin pink, kotak putih) di sisi kanan sebagai pengganti ilustrasi 3D. Contoh isi: "Jangan lupa. Buat lelang panen baru" + tombol "Buat lelang".
+Kartu lebar bergradasi `--forest-900` ke `--emerald-800` (dengan semburat `--green-500` di sudut), teks putih, tombol `.btn-primary`. Hiasan sisi kanan dibuat dari CSS murni: lingkaran dan bentuk daun (elemen dengan `border-radius: 0 100% 0 100%`) bertumpuk dalam warna hijau segar dan limau yang agak transparan, sebagai pengganti ilustrasi gambar. Contoh isi: "Siap panen? Buat lelang panen baru" + tombol "Buat lelang".
 
-### 5.9 Formulir
+### 6.10 Formulir
 
 | Kelas | Keterangan |
 |---|---|
 | `.form-group` | Label di atas input, jarak 16px |
-| `.input`, `.select`, `.textarea` | Latar `--surface-soft`, garis `--line`, radius 12px, tinggi 44px, fokus: garis `--primary` + bayangan `0 0 0 3px rgba(23,134,154,.25)` |
+| `.input`, `.select`, `.textarea` | Latar putih transparan, garis `--line`, radius 12px, tinggi 44px; fokus: garis `--green-500` + `0 0 0 3px rgba(67,217,128,.28)` |
 | `.form-error` | Teks `--danger` kecil di bawah input |
 | `.form-grid` | Dua kolom di desktop, satu kolom di ponsel |
 
 Nama atribut `name` pada input **sama persis dengan nama kolom tabel** (lihat `schema.sql`).
 
-### 5.10 Notifikasi (flash message)
+### 6.11 Notifikasi (flash message)
 
-`.alert`, `.alert-success`, `.alert-error`, `.alert-info`: kartu tipis dengan garis kiri 4px berwarna status, tampil di atas konten setelah setiap aksi.
+`.alert`, `.alert-success`, `.alert-error`, `.alert-info`, `.alert-warning`: kartu tipis (kaca, radius 14px) dengan garis kiri 4px berwarna status, tampil di atas konten setelah setiap aksi.
 
-### 5.11 Keadaan kosong
+### 6.12 Keadaan kosong
 
-Bila tabel/daftar kosong, tampilkan teks ramah dan tombol aksi, bukan tabel kosong. Contoh: "Belum ada lelang. Buat lelang panen pertamamu."
+Bila daftar kosong, tampilkan teks ramah dan tombol aksi. Contoh: "Belum ada lelang. Buat lelang panen pertamamu."
 
-### 5.12 Ikon
+### 6.13 Ikon
 
-Tanpa library ikon. Pakai **SVG inline** sederhana (garis 1.75px, tanpa isian) yang disimpan di `includes/icons.php` sebagai fungsi `ikon('nama')`. Daftar minimal: `dashboard`, `panen`, `keuangan`, `kalender` (musim), `keranjang` (saprotan), `pekerja`, `lonceng`, `cari`, `keluar`. Emoji boleh dipakai sebagai cadangan.
+Tanpa library ikon dan **tanpa emoji berwarna di menu** (warnanya tidak seragam dengan palet). Pakai **SVG inline monoline** (garis 1.75px, tanpa isian, `stroke: currentColor`) yang disimpan di `includes/icons.php` sebagai fungsi `ikon('nama')`. Dengan `currentColor`, ikon otomatis mengikuti warna menu (abu kehijauan biasa, hijau segar saat aktif).
 
-### 5.13 Avatar
+Daftar minimal: `dashboard`, `panen` (tunas/daun), `keuangan`, `musim` (kalender), `saprotan` (keranjang), `pekerja`, `lonceng`, `cari`, `keluar`, `panah`.
 
-Lingkaran 40px berisi inisial nama pada latar `--primary-soft`, teks `--primary-deep` (tanpa foto).
+### 6.14 Avatar
 
-## 6. Dashboard Petani (prioritas responsif)
+Lingkaran 40px berisi inisial pada latar `rgba(67,217,128,.18)`, teks `--green-800`, berat 700 (tanpa foto).
 
-Dashboard petani adalah halaman yang paling dipoles dan paling diuji di berbagai ukuran layar. Susunan mengikuti gambar referensi.
+## 7. Dashboard Petani (prioritas responsif)
 
-### 6.1 Pemetaan widget
+Dashboard petani adalah halaman yang paling dipoles dan paling diuji di berbagai ukuran layar.
 
-| Posisi di referensi | Widget di platform kita | Sumber data |
+### 7.1 Pemetaan widget
+
+| Baris | Widget | Sumber data |
 |---|---|---|
-| "Next game" | **Panen terdekat**: komoditas, estimasi tonase, tanggal panen, harga dasar, tawaran tertinggi saat ini | `hasil_panen` status `aktif`, tanggal panen terdekat; `MAX(penawaran_lelang.harga_tawar)` |
-| "Games statistic" | **Ringkasan lelang**: progress bar aktif / selesai / dibatalkan + angkanya | `COUNT(*)` per status di `hasil_panen` |
-| "Standings" | **Tawaran terbaru**: tabel (lelang, penawar, harga/kg, waktu, status) | `penawaran_lelang` JOIN `hasil_panen`, 5 baris terbaru |
-| Kartu statistik (4 buah) | **Pendapatan musim berjalan**, **Total biaya**, **Laba/rugi bersih**, **Pesanan saprotan diproses** | `transaksi_keuangan` per `musim_tanam` berstatus `berjalan`; `pesanan_saprotan` status `menunggu`/`disetujui` |
-| Banner "Setup training" | **Banner CTA**: "Buat lelang panen baru" + tombol | tautan ke form lelang |
+| 1 | **Pendapatan musim berjalan**: `.stat` + mini grafik | `SUM(nominal)` jenis `pendapatan` pada `musim_tanam` berstatus `berjalan` |
+| 1 | **Total biaya**: `.stat` + mini grafik | Idem, jenis `pengeluaran` |
+| 1 | **Laba/rugi bersih**: `.stat`, hijau bila positif, terakota bila negatif | Pendapatan dikurangi biaya |
+| 2 | **Lelang selesai**: `.ring` dengan persentase lelang `selesai` dari seluruh lelang | `COUNT(*)` per status di `hasil_panen` |
+| 2 | **Ringkasan lelang**: daftar status (titik berwarna + jumlah) dan batang bertingkat | `COUNT(*)` per status di `hasil_panen` |
+| 2 | **Panen terdekat** (`.card-dark`): komoditas, tonase, tanggal panen, harga dasar, tawaran tertinggi | `hasil_panen` aktif dengan tanggal panen terdekat; `MAX(harga_tawar)` |
+| 3 | **Tawaran terbaru**: tabel (lelang, penawar, harga/kg, waktu, status) | `penawaran_lelang` JOIN `hasil_panen`, 5 baris terbaru |
+| 3 | **Banner CTA** "Buat lelang panen baru" | Tautan ke form lelang |
+| 3 | Dua kartu kecil: **Pesanan saprotan diproses** dan **Lowongan masih buka** | `pesanan_saprotan` status `menunggu`/`disetujui`; `lowongan_kerja` status `buka` |
 
-Tambahan di bawah (baris ketiga, opsional bila waktu cukup): kartu **Pesanan saprotan terbaru** dan kartu **Lowongan saya yang masih buka**.
+Laba/rugi bernilai negatif ditampilkan dengan warna terakota dan tanda minus (`.stat-down`).
 
-Laba/rugi bernilai negatif ditampilkan dengan warna `--danger` dan tanda minus; positif dengan `--success`.
-
-### 6.2 Tata letak desktop (≥ 1024px)
+### 7.2 Tata letak desktop (≥ 1024px)
 
 ```
-┌─────────────────────────────┬─────────────────────────────┐
-│ PANEN TERDEKAT              │ RINGKASAN LELANG            │
-│ Padi · 2,5 ton · 12 Des     │ ████████████░░░░▒▒▒         │
-│ Tawaran tertinggi Rp 6.800  │ Aktif 4 | Selesai 6 | Batal 1│
-├─────────────────────────────┼──────────────┬──────────────┤
-│ TAWARAN TERBARU             │ PENDAPATAN   │ TOTAL BIAYA  │
-│ lelang  penawar  harga  ... │ Rp 12,4 jt   │ Rp 5,1 jt    │
-│ ...                         ├──────────────┼──────────────┤
-│ ...                         │ LABA BERSIH  │ PESANAN      │
-│                             │ Rp 7,3 jt    │ DIPROSES  2  │
-│                             ├──────────────┴──────────────┤
-│                             │ Buat lelang panen baru  [▶] │
-└─────────────────────────────┴─────────────────────────────┘
+┌──────────────┬──────────────┬──────────────┐
+│ PENDAPATAN   │ TOTAL BIAYA  │ LABA BERSIH  │   baris 1: 3 kartu statistik
+│ Rp 12,4 jt ▂▄│ Rp 5,1 jt ▃▂ │ Rp 7,3 jt ▄▆ │
+└──────────────┴──────────────┴──────────────┘
+┌────────────┬───────────────────┬────────────────────────┐
+│  ◔ 72%     │ RINGKASAN LELANG  │ ▓ PANEN TERDEKAT ▓     │   baris 2
+│  Lelang    │ ● Aktif       4   │ ▓ Padi · 2,5 ton ▓     │
+│  selesai   │ ● Selesai     6   │ ▓ Tertinggi Rp 6.800▓  │
+│            │ ● Dibatalkan  1   │ ▓ (kartu gelap)    ▓   │
+└────────────┴───────────────────┴────────────────────────┘
+┌──────────────────────────────┬───────────────────────────┐
+│ TAWARAN TERBARU              │ ▓ Siap panen?            ▓│   baris 3
+│ lelang  penawar  harga  ...  │ ▓ Buat lelang baru [▶]   ▓│
+│ ...                          ├─────────────┬─────────────┤
+│ ...                          │ Pesanan  2  │ Lowongan 3  │
+└──────────────────────────────┴─────────────┴─────────────┘
 ```
-
-Susunan dibuat dengan dua baris grid, tiap baris dua kolom (tanpa `grid-template-areas`). Nilai dasar di bawah adalah versi ponsel (satu kolom); lebar kolom untuk tablet dan desktop diatur di bagian 6.3.
 
 ```css
-.dash        { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
-.dash-row-1  { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
-.dash-row-2  { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
-.stat-grid   { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, 1fr); }
+.dash     { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+.dash-r1  { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+.dash-r2  { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+.dash-r3  { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+.mini-grid{ display: grid; gap: var(--space-4); grid-template-columns: 1fr 1fr; }
 ```
 
-Struktur HTML: `.dash` berisi `.dash-row-1` (kartu Panen terdekat + kartu Ringkasan lelang) dan `.dash-row-2` (kartu Tabel tawaran + kolom kanan berisi `.stat-grid` dan banner CTA).
+Nilai dasar adalah versi ponsel (satu kolom); lebar kolom untuk tablet dan desktop diatur di bagian 8.
 
-### 6.3 Aturan responsif
+Struktur HTML: `.dash` berisi `.dash-r1` (3 `.stat`), `.dash-r2` (kartu ring, kartu ringkasan, `.card-dark` panen terdekat), dan `.dash-r3` (kartu tabel + kolom kanan berisi banner dan `.mini-grid`).
 
-Pendekatan **mobile-first**: gaya dasar untuk ponsel, lalu diperluas dengan `min-width`.
+## 8. Responsif
+
+Pendekatan **mobile-first**: gaya dasar untuk ponsel, diperluas dengan `min-width`. Karena kerangka penuh layar, di semua ukuran konten mengisi sampai tepi layar.
 
 | Breakpoint | Lebar | Perilaku |
 |---|---|---|
-| Ponsel | < 640px | Satu kolom. Sidebar jadi laci (drawer) dengan tombol ☰. Kartu statistik 2×2. Tabel berubah menjadi daftar kartu. Banner CTA di atas statistik. Topbar: sapaan dan avatar saja, judul diperkecil lewat `clamp()` |
-| Tablet | 640px sampai 1023px | Sidebar tetap laci. Dua kolom untuk "Panen terdekat" dan "Ringkasan lelang". Tabel penuh lebar. Kartu statistik 4 dalam satu baris atau 2×2 |
-| Laptop | 1024px sampai 1279px | Sidebar tampil tetap (lebar 220px). Grid dua kolom seperti 6.2 |
-| Desktop | ≥ 1280px | Bingkai `.app` berlebar maks 1280px dengan margin sekeliling, seperti gambar referensi |
+| Ponsel | < 640px | Satu kolom. Sidebar jadi laci dengan tombol ☰ (SVG) di topbar. Padding konten 16px. Kartu statistik ditumpuk satu per baris. Tabel berubah menjadi daftar kartu. Banner CTA berada tepat setelah baris 1 |
+| Tablet | 640px sampai 1023px | Sidebar tetap laci. Baris 1: 3 kartu sejajar. Baris 2: ring dan ringkasan sejajar, kartu panen terdekat di bawahnya. Baris 3: satu kolom |
+| Laptop | 1024px sampai 1279px | Sidebar tampil tetap (lebar 230px). Baris 2: 3 kolom. Baris 3: 7fr dan 5fr |
+| Desktop | ≥ 1280px | Sidebar 250px, konten penuh, `max-width: 1600px` pada `.content` |
 
 ```css
-/* Dasar: ponsel */
-.app { display: block; margin: 0; border-radius: 0; }
+/* Dasar: ponsel. Kerangka menumpuk, sidebar menjadi laci */
+.app { display: block; }
 .sidebar {
-  position: fixed; inset: 0 auto 0 0; width: 260px; z-index: 50;
+  position: fixed; inset: 0 auto 0 0; width: 270px; height: 100vh; z-index: 50;
   transform: translateX(-100%); transition: transform .25s ease;
-  background: var(--surface-soft);
 }
 .sidebar.open { transform: translateX(0); }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(15,46,37,.35); z-index: 40; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(5, 33, 36, .5); z-index: 40; }
 .overlay.show { display: block; }
-.menu-btn { display: inline-flex; }
+.menu-btn { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; }
+.topbar  { padding: var(--space-4); }
+.content { padding: var(--space-4); }
 
 /* Tablet */
 @media (min-width: 640px) {
-  .dash-row-1 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
-  .stat-grid  { grid-template-columns: repeat(4, 1fr); }
+  .dash-r1 { grid-template-columns: repeat(3, 1fr); }
+  .dash-r2 { grid-template-columns: 1fr 2fr; }
+  .dash-r2 > .card-dark { grid-column: 1 / -1; }
+  .topbar  { padding: var(--space-6) var(--space-6) var(--space-4); }
+  .content { padding: var(--space-6); }
 }
 
-/* Laptop ke atas */
+/* Laptop ke atas: sidebar tampil tetap */
 @media (min-width: 1024px) {
-  .app { display: grid; grid-template-columns: 220px 1fr; margin: var(--space-6) auto; border-radius: var(--radius-frame); }
-  .sidebar { position: static; transform: none; background: transparent; width: auto; }
+  .app { display: grid; grid-template-columns: 230px 1fr; }
+  .sidebar { position: sticky; transform: none; width: auto; }
   .menu-btn, .overlay { display: none !important; }
-  .dash-row-2 { grid-template-columns: 7fr 5fr; }
-  .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+  .dash-r2 { grid-template-columns: 1fr 1.4fr 1.6fr; }
+  .dash-r2 > .card-dark { grid-column: auto; }
+  .dash-r3 { grid-template-columns: 7fr 5fr; }
+  .topbar  { padding: var(--space-6) var(--space-8) var(--space-4); }
+  .content { padding: var(--space-6) var(--space-8) var(--space-10); }
 }
-@media (min-width: 1280px) { .app { grid-template-columns: 240px 1fr; } }
+@media (min-width: 1280px) { .app { grid-template-columns: 250px 1fr; } }
 ```
 
-Buka/tutup laci dengan JavaScript vanilla (±10 baris di `assets/js/app.js`):
+JavaScript vanilla untuk laci menu (`assets/js/app.js`):
 
 ```js
 const sidebar = document.querySelector('.sidebar');
@@ -416,55 +531,58 @@ Tabel menjadi kartu di ponsel (setiap `<td>` membawa `data-label`):
 }
 ```
 
-### 6.4 Aturan umum responsif
-
+Aturan umum responsif:
 - Viewport wajib: `<meta name="viewport" content="width=device-width, initial-scale=1">` di `includes/header.php`.
 - Area sentuh minimal **44×44px** (menu, tombol, ikon).
-- Ukuran teks tidak di bawah 13px; input 16px agar tidak memicu zoom otomatis di iOS.
-- Gambar dan elemen lebar memakai `max-width: 100%`.
+- Teks tidak di bawah 13px; input 16px agar tidak memicu zoom otomatis di iOS.
 - Tidak ada scroll horizontal pada halaman; tabel lebar dibungkus `.table-wrap`.
-- Satuan relatif (`rem`, `%`, `fr`, `clamp()`), hindari lebar piksel tetap pada kartu.
-- Uji minimal di tiga lebar: **375px** (ponsel), **768px** (tablet), **1366px** (laptop), memakai mode responsif di DevTools browser.
+- Satuan relatif (`rem`, `%`, `fr`, `clamp()`); hindari lebar piksel tetap pada kartu.
+- Efek blur dibatasi pada kartu saja (hemat kinerja di ponsel).
+- Uji minimal di tiga lebar: **375px**, **768px**, **1366px**, memakai mode responsif DevTools.
 
-## 7. Dashboard Role Lain (ringkas)
+## 9. Dashboard Role Lain (ringkas)
 
 | Role | Susunan |
 |---|---|
-| Tengkulak | Sapaan; kartu "Lelang aktif" (jumlah); kartu "Penawaran saya" (menunggu/menang/kalah); tabel lelang aktif terbaru; banner CTA "Jelajahi pasar lelang" |
-| Kios | Sapaan; kartu statistik: jumlah produk, stok menipis, pesanan menunggu, pesanan selesai bulan ini; tabel pesanan masuk terbaru; banner CTA "Tambah produk" |
-| Publik | Tanpa sidebar. Bar atas (logo, Beranda, Bursa Kerja, Masuk). Halaman Bursa Kerja: filter di atas, lalu kartu lowongan berbentuk grid (`repeat(auto-fill, minmax(280px, 1fr))`), tiap kartu menampilkan judul, lokasi, upah harian, tanggal mulai, tombol "Lihat kontak" |
+| Tengkulak | Baris statistik (lelang aktif, penawaran menunggu, menang, kalah); tabel lelang aktif terbaru; kartu gelap "Tawaran saya yang sedang unggul"; banner CTA "Jelajahi pasar lelang" |
+| Kios | Baris statistik (jumlah produk, stok menipis, pesanan menunggu, selesai bulan ini); tabel pesanan masuk terbaru; banner CTA "Tambah produk" |
+| Publik | Tanpa sidebar. Bar atas datar (logo, Beranda, Bursa Kerja, Masuk). Halaman Bursa Kerja: filter di atas, lalu grid kartu lowongan `repeat(auto-fill, minmax(280px, 1fr))` berisi judul, lokasi, upah harian, tanggal mulai, tombol "Lihat kontak" |
 
-Landing page (`index.php`): hero singkat dengan judul masalah dan solusi, tiga kartu manfaat (lelang adil, catat keuangan, bursa kerja), tombol Masuk dan Daftar, serta keterkaitan SDG 8.
+Landing page (`index.php`): hero tegas dengan latar gradasi hijau hutan (penuh lebar, tanpa bingkai), judul masalah dan solusi, tiga kartu kaca manfaat (lelang adil, catat keuangan, bursa kerja), tombol Masuk dan Daftar, serta keterkaitan SDG 8.
 
-## 8. Pemetaan File
+## 10. Pemetaan File
 
 | Berkas | Isi | PIC |
 |---|---|---|
-| `assets/css/style.css` | Token, komponen, layout, responsif | Agung (perubahan lewat permintaan atau pull request) |
+| `assets/css/style.css` | Token, kerangka, komponen, responsif | Agung (perubahan lewat permintaan atau pull request) |
 | `assets/js/app.js` | Toggle laci menu, konfirmasi aksi, penutup flash message | Agung |
 | `includes/header.php` | `<head>`, viewport, tautan CSS, pembuka `.app` | Agung |
 | `includes/sidebar.php` | Menu sesuai `$_SESSION['role']` | Agung |
-| `includes/footer.php` | Penutup, skrip JS | Agung |
-| `includes/icons.php` | Fungsi `ikon('nama')` berisi SVG inline | Agung |
+| `includes/footer.php` | Penutup dan skrip JS | Agung |
+| `includes/icons.php` | Fungsi `ikon('nama')` berisi SVG monoline | Agung |
 
-## 9. Aturan untuk Semua Anggota
+## 11. Aturan untuk Semua Anggota
 
-1. Jangan menulis `style="..."` selain untuk nilai dinamis (lebar progress bar, warna dari data).
+1. Jangan menulis `style="..."` selain untuk nilai dinamis (`--p`, `--h`, lebar segmen progress).
 2. Jangan menambah file CSS lain atau blok `<style>` per halaman; semua gaya di `style.css`.
-3. Gunakan kelas komponen di bagian 5. Butuh komponen baru: minta ke Agung dahulu agar tidak ada gaya ganda.
-4. Satu halaman = satu `<h1>` (judul halaman), judul kartu memakai `<h2>`.
-5. Semua halaman terproteksi diawali `include` header dan sidebar, diakhiri footer.
-6. Setelah selesai membuat halaman, uji di 375px, 768px, dan 1366px.
+3. Gunakan kelas komponen di bagian 6. Butuh komponen baru: minta ke Agung dahulu agar tidak ada gaya ganda.
+4. Radius dan efek kaca hanya untuk komponen. Jangan menambahkannya ke kerangka halaman.
+5. Satu halaman = satu `<h1>` (judul halaman); judul kartu memakai `<h2>`.
+6. Semua halaman terproteksi diawali `include` header dan sidebar, diakhiri footer.
+7. Setelah selesai membuat halaman, uji di 375px, 768px, dan 1366px.
 
-## 10. Checklist Desain
+## 12. Checklist Desain
 
 - [ ] Token `:root` terpasang dan dipakai di semua komponen
-- [ ] Latar gradasi teal dan lavender tampil, bingkai kaca membulat tampil
-- [ ] Sidebar dengan pil aktif berwarna teal
-- [ ] Kartu, kartu statistik, tabel, badge, tombol, form, alert tersedia sebagai kelas
-- [ ] Dashboard petani sesuai pemetaan bagian 6.1
+- [ ] Kerangka penuh layar: tidak ada radius, margin, atau blur pada `.app`, `.sidebar`, `.main`, `.topbar`
+- [ ] Sidebar hijau hutan bergradasi dengan menu aktif bersinar hijau
+- [ ] Area konten bergradasi mint dengan dua semburat cahaya
+- [ ] Kartu kaca (radius 20px, blur, garis tepi terang) dipakai konsisten
+- [ ] Kartu statistik dengan mini grafik, cincin progress, badge, tombol, form, alert tersedia sebagai kelas
+- [ ] Ikon SVG monoline menggantikan emoji berwarna di menu
+- [ ] Dashboard petani sesuai pemetaan bagian 7.1
 - [ ] Sidebar menjadi laci di bawah 1024px dan berfungsi
 - [ ] Tabel menjadi kartu di bawah 640px
-- [ ] Tidak ada scroll horizontal pada halaman di 375px
+- [ ] Tidak ada scroll horizontal di 375px
 - [ ] Tidak ada library, font, atau ikon dari luar
-- [ ] Teks isi memiliki kontras yang cukup di atas kartu
+- [ ] Teks isi memiliki kontras cukup; teks di tombol hijau berwarna gelap
