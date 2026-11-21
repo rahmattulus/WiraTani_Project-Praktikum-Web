@@ -91,6 +91,7 @@ Kolom **Selesai bila** adalah definisi selesai yang dicek sebelum lanjut.
 ### Fase 2: UI per modul dengan data dummy (Hari 4 sampai 6)
 
 Semua halaman dibuat sebagai file `.php` dengan array data dummy. **Nama input form = nama kolom tabel.**
+Setiap menu modul dibuat sebagai folder di bawah folder role; `index.php` menjadi halaman utama, sedangkan halaman lain seperti form dan detail berada di folder yang sama. Contoh S10: `petani/lelang/index.php`; S11: `tengkulak/pasar/index.php`.
 
 | ID | Langkah | PIC | Selesai bila |
 |---|---|---|---|
