@@ -1,0 +1,178 @@
+<?php
+/*
+ * Data dummy UI ERP, musim tanam, dan lowongan (Fase 2).
+ * Hapus atau ganti dengan query database saat implementasi backend.
+ */
+
+$demo_user_id = 1;
+
+$demo_petani = [
+    1 => [
+        'nama' => 'Budi Santoso',
+        'no_telepon' => '081234567890',
+        'alamat' => 'Desa Jatinom, Klaten',
+    ],
+];
+
+$demo_musim_tanam = [
+    [
+        'id' => 1,
+        'user_id' => 1,
+        'nama_musim' => 'Musim Tanam 1 2026',
+        'komoditas' => 'Padi',
+        'tanggal_mulai' => '2026-09-10',
+        'tanggal_selesai' => null,
+        'status' => 'berjalan',
+    ],
+    [
+        'id' => 2,
+        'user_id' => 1,
+        'nama_musim' => 'Tanam Jagung 2026',
+        'komoditas' => 'Jagung',
+        'tanggal_mulai' => '2026-08-15',
+        'tanggal_selesai' => null,
+        'status' => 'berjalan',
+    ],
+    [
+        'id' => 3,
+        'user_id' => 1,
+        'nama_musim' => 'Musim Tanam 2 2025',
+        'komoditas' => 'Padi',
+        'tanggal_mulai' => '2025-01-05',
+        'tanggal_selesai' => '2025-05-30',
+        'status' => 'selesai',
+    ],
+];
+
+$demo_transaksi = [
+    [
+        'id' => 1,
+        'musim_tanam_id' => 1,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'bibit',
+        'nominal' => 1250000,
+        'tanggal' => '2026-09-12',
+        'keterangan' => 'Benih padi varietas Inpari',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => null,
+    ],
+    [
+        'id' => 2,
+        'musim_tanam_id' => 1,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'pupuk',
+        'nominal' => 2850000,
+        'tanggal' => '2026-09-20',
+        'keterangan' => 'Pupuk untuk pemupukan pertama',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => 1,
+    ],
+    [
+        'id' => 3,
+        'musim_tanam_id' => 1,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'tenaga_kerja',
+        'nominal' => 900000,
+        'tanggal' => '2026-09-25',
+        'keterangan' => 'Upah olah lahan',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => null,
+    ],
+    [
+        'id' => 4,
+        'musim_tanam_id' => 1,
+        'jenis' => 'pendapatan',
+        'kategori' => 'hasil_lelang',
+        'nominal' => 16400000,
+        'tanggal' => '2026-11-15',
+        'keterangan' => 'Penjualan hasil panen padi',
+        'hasil_panen_id' => 1,
+        'pesanan_saprotan_id' => null,
+    ],
+    [
+        'id' => 5,
+        'musim_tanam_id' => 2,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'alat',
+        'nominal' => 750000,
+        'tanggal' => '2026-09-02',
+        'keterangan' => 'Sewa alat pengolah lahan',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => 2,
+    ],
+    [
+        'id' => 6,
+        'musim_tanam_id' => 2,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'bibit',
+        'nominal' => 1800000,
+        'tanggal' => '2026-08-20',
+        'keterangan' => 'Benih jagung hibrida',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => null,
+    ],
+    [
+        'id' => 7,
+        'musim_tanam_id' => 3,
+        'jenis' => 'pendapatan',
+        'kategori' => 'hasil_lelang',
+        'nominal' => 14200000,
+        'tanggal' => '2025-05-20',
+        'keterangan' => 'Penjualan hasil panen musim lalu',
+        'hasil_panen_id' => 2,
+        'pesanan_saprotan_id' => null,
+    ],
+    [
+        'id' => 8,
+        'musim_tanam_id' => 3,
+        'jenis' => 'pengeluaran',
+        'kategori' => 'pupuk',
+        'nominal' => 3100000,
+        'tanggal' => '2025-02-01',
+        'keterangan' => 'Pupuk dan pembenah tanah',
+        'hasil_panen_id' => null,
+        'pesanan_saprotan_id' => 3,
+    ],
+];
+
+$demo_lowongan = [
+    [
+        'id' => 1,
+        'user_id' => 1,
+        'judul' => 'Buruh tanam padi',
+        'jenis_pekerjaan' => 'tanam',
+        'lokasi' => 'Desa Jatinom, Klaten',
+        'jumlah_buruh' => 6,
+        'upah_harian' => 100000,
+        'tanggal_mulai' => '2026-11-27',
+        'durasi_hari' => 2,
+        'deskripsi' => 'Membantu menanam bibit padi di lahan sawah.',
+        'status' => 'buka',
+    ],
+    [
+        'id' => 2,
+        'user_id' => 1,
+        'judul' => 'Bantuan panen padi',
+        'jenis_pekerjaan' => 'panen',
+        'lokasi' => 'Desa Jatinom, Klaten',
+        'jumlah_buruh' => 4,
+        'upah_harian' => 125000,
+        'tanggal_mulai' => '2026-12-10',
+        'durasi_hari' => 3,
+        'deskripsi' => 'Membantu memanen dan mengumpulkan padi.',
+        'status' => 'ditutup',
+    ],
+    [
+        'id' => 3,
+        'user_id' => 1,
+        'judul' => 'Pembersihan saluran irigasi',
+        'jenis_pekerjaan' => 'lainnya',
+        'lokasi' => 'Desa Jatinom, Klaten',
+        'jumlah_buruh' => 3,
+        'upah_harian' => 90000,
+        'tanggal_mulai' => '2026-11-30',
+        'durasi_hari' => 1,
+        'deskripsi' => 'Membersihkan saluran air di sekitar sawah.',
+        'status' => 'buka',
+    ],
+];

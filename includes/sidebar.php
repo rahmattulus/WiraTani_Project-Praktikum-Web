@@ -13,10 +13,10 @@ $semua_menu = [
     'petani' => [
         ['dashboard', 'Dashboard',    'index.php',     '📊'],
         ['lelang',    'Lelang Panen', 'lelang.php',    '🌾'],
-        ['erp',       'ERP Keuangan', 'erp.php',       '💰'],
-        ['musim',     'Musim Tanam',  'musim.php',     '📅'],
+        ['erp',       'ERP Keuangan', 'erp/index.php', '💰'],
+        ['musim',     'Musim Tanam',  'musim/index.php', '📅'],
         ['saprotan',  'Saprotan',     'saprotan.php',  '🛒'],
-        ['lowongan',  'Lowongan',     'lowongan.php',  '👷'],
+        ['lowongan',  'Lowongan',     'lowongan/index.php', '👷'],
     ],
     'tengkulak' => [
         ['dashboard', 'Dashboard',       'index.php',     '📊'],
