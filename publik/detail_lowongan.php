@@ -1,7 +1,7 @@
 <?php
-/* Detail lowongan publik (S15); pengunjung tidak perlu login. */
+/* Detail lowongan publik; hanya menampilkan lowongan yang masih buka. */
 require_once __DIR__ . '/../includes/helper.php';
-require_once __DIR__ . '/../petani/dummy_musim.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 $id_input = $_GET['id'] ?? '';
 if (!is_string($id_input)) {
@@ -9,14 +9,21 @@ if (!is_string($id_input)) {
 } else {
     $id_input = trim($id_input);
 }
+
 $lowongan_detail = null;
 if (ctype_digit($id_input) && (int) $id_input > 0) {
-    foreach ($demo_lowongan as $lowongan) {
-        if ($lowongan['id'] === (int) $id_input && $lowongan['status'] === 'buka') {
-            $lowongan_detail = $lowongan;
-            break;
-        }
-    }
+    $id = (int) $id_input;
+    $stmt = $koneksi->prepare(
+        "SELECT l.id, l.judul, l.jenis_pekerjaan, l.lokasi, l.jumlah_buruh,
+                l.upah_harian, l.tanggal_mulai, l.durasi_hari, l.deskripsi,
+                u.nama AS nama_petani, u.no_telepon, u.alamat
+         FROM lowongan_kerja l
+         INNER JOIN users u ON u.id = l.user_id
+         WHERE l.id = ? AND l.status = 'buka'"
+    );
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $lowongan_detail = $stmt->get_result()->fetch_assoc();
 }
 
 $label_pekerjaan = [
@@ -24,11 +31,8 @@ $label_pekerjaan = [
     'panen' => 'Panen',
     'lainnya' => 'Lainnya',
 ];
-$kontak_petani = $lowongan_detail
-    ? ($demo_petani[$lowongan_detail['user_id']] ?? null)
-    : null;
-$nomor_telepon = $kontak_petani
-    ? preg_replace('/[^0-9+]/', '', $kontak_petani['no_telepon'])
+$nomor_telepon = $lowongan_detail
+    ? preg_replace('/[^0-9+]/', '', $lowongan_detail['no_telepon'])
     : '';
 
 $layout = 'publik';
@@ -73,22 +77,20 @@ include __DIR__ . '/../includes/header.php';
 
         <section class="card">
           <h2 class="card-title">Deskripsi pekerjaan</h2>
-          <p><?= e($lowongan_detail['deskripsi']) ?></p>
+          <p><?= e($lowongan_detail['deskripsi'] ?: 'Tidak ada deskripsi tambahan.') ?></p>
         </section>
 
         <section class="card">
           <h2 class="card-title">Kontak petani</h2>
-          <?php if (!$kontak_petani): ?>
-            <p>Informasi kontak belum tersedia.</p>
-          <?php else: ?>
-            <p>
-              <strong><?= e($kontak_petani['nama']) ?></strong><br>
-              <?= e($kontak_petani['alamat']) ?><br>
-              <?= e($kontak_petani['no_telepon']) ?>
-            </p>
+          <p>
+            <strong><?= e($lowongan_detail['nama_petani']) ?></strong><br>
+            <?= e($lowongan_detail['alamat']) ?><br>
+            <?= e($lowongan_detail['no_telepon']) ?>
+          </p>
+          <div class="form-actions">
             <a class="btn btn-primary" href="tel:<?= e($nomor_telepon) ?>">Hubungi petani</a>
-          <?php endif; ?>
-          <a class="btn btn-ghost" href="<?= BASE_URL ?>/publik/bursa.php">Kembali ke bursa kerja</a>
+            <a class="btn btn-ghost" href="<?= BASE_URL ?>/publik/bursa.php">Kembali ke bursa kerja</a>
+          </div>
         </section>
       <?php endif; ?>
     </div>

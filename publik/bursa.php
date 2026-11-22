@@ -1,7 +1,7 @@
 <?php
-/* Bursa kerja publik (S15): hanya menampilkan lowongan yang masih buka. */
+/* Bursa kerja publik: hanya lowongan berstatus buka. */
 require_once __DIR__ . '/../includes/helper.php';
-require_once __DIR__ . '/../petani/dummy_musim.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 $jenis_pekerjaan = $_GET['jenis_pekerjaan'] ?? '';
 if (!is_string($jenis_pekerjaan)) {
@@ -18,6 +18,7 @@ if (!is_string($lokasi)) {
 } else {
     $lokasi = trim($lokasi);
 }
+$lokasi_cari = '%' . $lokasi . '%';
 
 $label_pekerjaan = [
     'tanam' => 'Tanam',
@@ -25,21 +26,20 @@ $label_pekerjaan = [
     'lainnya' => 'Lainnya',
 ];
 
-$lowongan_tampil = array_filter($demo_lowongan, function ($lowongan) use ($jenis_pekerjaan, $lokasi) {
-    if ($lowongan['status'] !== 'buka') {
-        return false;
-    }
-    if ($jenis_pekerjaan !== '' && $lowongan['jenis_pekerjaan'] !== $jenis_pekerjaan) {
-        return false;
-    }
-    if ($lokasi !== '' && stripos($lowongan['lokasi'], $lokasi) === false) {
-        return false;
-    }
-    return true;
-});
-usort($lowongan_tampil, function ($a, $b) {
-    return strcmp($a['tanggal_mulai'], $b['tanggal_mulai']);
-});
+$stmt = $koneksi->prepare(
+    "SELECT l.id, l.judul, l.jenis_pekerjaan, l.lokasi, l.jumlah_buruh,
+            l.upah_harian, l.tanggal_mulai, l.durasi_hari, l.deskripsi,
+            u.nama AS nama_petani
+     FROM lowongan_kerja l
+     INNER JOIN users u ON u.id = l.user_id
+     WHERE l.status = 'buka'
+       AND (? = '' OR l.jenis_pekerjaan = ?)
+       AND (? = '' OR l.lokasi LIKE ?)
+     ORDER BY l.tanggal_mulai ASC, l.created_at DESC"
+);
+$stmt->bind_param('ssss', $jenis_pekerjaan, $jenis_pekerjaan, $lokasi, $lokasi_cari);
+$stmt->execute();
+$lowongan_tampil = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $layout = 'publik';
 $judul_halaman = 'Bursa Kerja Buruh Tani';
@@ -96,6 +96,7 @@ include __DIR__ . '/../includes/header.php';
                 Mulai <?= e(format_tanggal($lowongan['tanggal_mulai'])) ?>
               </p>
               <p><?= e($lowongan['deskripsi']) ?></p>
+              <p class="text-muted">Dibuka oleh <?= e($lowongan['nama_petani']) ?></p>
               <a class="btn btn-primary" href="<?= BASE_URL ?>/publik/detail_lowongan.php?id=<?= (int) $lowongan['id'] ?>">
                 Lihat detail dan kontak
               </a>
