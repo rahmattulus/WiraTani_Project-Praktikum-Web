@@ -46,8 +46,8 @@ $produk = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $judul_halaman = 'Saprotan';
 $menu_aktif    = 'saprotan';
-include __DIR__ . '/../includes/header.php';
-include __DIR__ . '/../includes/sidebar.php';
+include __DIR__ . '/../../includes/header.php';
+include __DIR__ . '/../../includes/sidebar.php';
 ?>
       <div class="dash">
         <section class="card">
@@ -119,4 +119,4 @@ include __DIR__ . '/../includes/sidebar.php';
           <?php endif; ?>
         </section>
       </div>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/../../includes/footer.php'; ?>

@@ -108,8 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $judul_halaman = 'Pesan Saprotan';
 $menu_aktif    = 'saprotan';
-include __DIR__ . '/../includes/header.php';
-include __DIR__ . '/../includes/sidebar.php';
+include __DIR__ . '/../../includes/header.php';
+include __DIR__ . '/../../includes/sidebar.php';
 ?>
       <div class="dash">
         <section class="card">
@@ -191,4 +191,4 @@ include __DIR__ . '/../includes/sidebar.php';
           <?php endif; ?>
         </section>
       </div>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/../../includes/footer.php'; ?>
