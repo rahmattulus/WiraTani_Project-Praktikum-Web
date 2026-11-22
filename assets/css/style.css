@@ -471,6 +471,101 @@ h2,
   color: var(--soil-500);
 }
 
+.spark {
+  display: flex;
+  height: 36px;
+  align-items: flex-end;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.spark i {
+  width: 6px;
+  height: calc(var(--h) * 1%);
+  border-radius: 3px;
+  background: var(--green-500);
+}
+
+.stat-down .spark i {
+  background: var(--soil-500);
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(112px, auto);
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.mini-grid .stat {
+  min-width: 0;
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  border: 1px solid var(--glass-border);
+  color: var(--ink);
+  background: var(--glass-solid);
+  text-decoration: none;
+}
+
+.mini-grid .stat:hover {
+  text-decoration: none;
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.won-auction-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.won-auction-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.won-auction-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.won-auction-item p {
+  margin: var(--space-1) 0;
+}
+
+.won-auction-item small {
+  color: var(--muted);
+}
+
+.won-auction-price {
+  display: grid;
+  flex: 0 0 auto;
+  gap: var(--space-1);
+  text-align: right;
+}
+
+.dash-r3-column {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-5);
+}
+
+.lelang-cta {
+  min-height: 100%;
+}
+
 .progress {
   display: flex;
   width: 100%;
@@ -865,6 +960,15 @@ h2,
     display: none;
   }
 
+  .won-auction-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .won-auction-price {
+    text-align: left;
+  }
+
   .table,
   .table tbody {
     display: block;
@@ -932,8 +1036,8 @@ h2,
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   }
 
-  .dash-r2 > .card-dark {
-    grid-column: 1 / -1;
+  .mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .stat-grid {
@@ -983,11 +1087,7 @@ h2,
   }
 
   .dash-r2 {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1.6fr);
-  }
-
-  .dash-r2 > .card-dark {
-    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1.35fr);
   }
 
   .dash-r3 {
