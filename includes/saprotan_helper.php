@@ -18,7 +18,7 @@ const STATUS_PESANAN = [
     'selesai'   => 'Selesai',
 ];
 
-const STOK_MENIPIS = 10;
+const STOK_MENIPIS = 5;
 
 function label_kategori(string $kategori): string
 {

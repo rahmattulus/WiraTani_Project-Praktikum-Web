@@ -15,6 +15,7 @@ $ringkasan = [
 $lelang_terbaru = [];
 $lelang_dimenangkan = [];
 $tawaran_unggul = null;
+$notifikasi_pemenang = null;
 
 try {
     $stmt = $koneksi->prepare(
@@ -48,7 +49,8 @@ try {
 
     $stmt = $koneksi->prepare(
         "SELECT h.id, h.komoditas, h.lokasi, h.tanggal_panen, h.estimasi_tonase,
-                u.nama AS nama_petani, p.harga_tawar, p.created_at
+                u.nama AS nama_petani, u.no_telepon AS no_telepon_petani,
+                p.harga_tawar, p.created_at
          FROM penawaran_lelang p
          INNER JOIN hasil_panen h ON h.id = p.hasil_panen_id
          INNER JOIN users u ON u.id = h.user_id
@@ -60,6 +62,20 @@ try {
     $stmt->execute();
     $lelang_dimenangkan = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
+
+    $notifikasi_pemenang = null;
+    if (!isset($_SESSION['lelang_pemenang_dinotifikasi']) || !is_array($_SESSION['lelang_pemenang_dinotifikasi'])) {
+        $_SESSION['lelang_pemenang_dinotifikasi'] = [];
+    }
+    foreach ($lelang_dimenangkan as $lelang_menang) {
+        $lelang_id = (int) $lelang_menang['id'];
+        if (!in_array($lelang_id, $_SESSION['lelang_pemenang_dinotifikasi'], true)) {
+            if ($notifikasi_pemenang === null) {
+                $notifikasi_pemenang = $lelang_menang;
+            }
+            $_SESSION['lelang_pemenang_dinotifikasi'][] = $lelang_id;
+        }
+    }
 
     $stmt = $koneksi->prepare(
         "SELECT h.id, h.komoditas, h.lokasi, h.estimasi_tonase, h.harga_dasar,
@@ -92,6 +108,15 @@ include __DIR__ . '/../includes/sidebar.php';
         <?php if ($database_error !== ''): ?>
           <div class="alert alert-error" role="alert"><?= e($database_error) ?></div>
         <?php else: ?>
+          <?php if ($notifikasi_pemenang): ?>
+            <div class="alert alert-success" role="status">
+              Selamat Anda memenangkan lelang <?= e($notifikasi_pemenang['komoditas']) ?>
+              sebanyak <?= e(number_format((float) $notifikasi_pemenang['estimasi_tonase'], 0, ',', '.')) ?> kg
+              milik <?= e($notifikasi_pemenang['nama_petani']) ?>
+              diharga <?= e(format_rupiah($notifikasi_pemenang['harga_tawar'])) ?>/kg
+            </div>
+          <?php endif; ?>
+          
           <div class="stat-grid">
             <article class="stat">
               <p class="stat-label">Lelang aktif</p>
@@ -136,6 +161,13 @@ include __DIR__ . '/../includes/sidebar.php';
                     <div class="won-auction-price">
                       <span class="stat-label">Tawaran menang</span>
                       <strong><?= e(format_rupiah($lelang_menang['harga_tawar'])) ?>/kg</strong>
+                      <?php
+                        $nomor_petani = preg_replace('/[^0-9]/', '', (string) $lelang_menang['no_telepon_petani']);
+                        if (substr($nomor_petani, 0, 1) === '0') {
+                            $nomor_petani = '62' . substr($nomor_petani, 1);
+                        }
+                      ?>
+                      <a class="btn btn-primary btn-sm" href="https://wa.me/<?= e($nomor_petani) ?>" target="_blank" rel="noopener noreferrer">Hubungi petani</a>
                     </div>
                   </li>
                 <?php endforeach; ?>

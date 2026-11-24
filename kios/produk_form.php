@@ -115,7 +115,7 @@ include __DIR__ . '/../includes/sidebar.php';
 
             <div class="form-group">
               <label for="harga">Harga (Rp)</label>
-              <input class="input" type="number" id="harga" name="harga" min="1" step="100"
+              <input class="input" type="number" id="harga" name="harga" min="1" step="1"
                      value="<?= e($produk['harga']) ?>" required>
               <?php if (isset($error)) tampil_error($error, 'harga'); ?>
             </div>

@@ -212,11 +212,16 @@
     var jumlah = form.querySelector('[name="jumlah"]');
     var durasi = form.querySelector('[name="durasi_hari"]');
     var hasil  = form.querySelector('[data-total]');
+    var stokAlert = document.getElementById('jumlah-stok-alert');
 
     var hitung = function () {
       var j = parseInt(jumlah.value, 10) || 0;
       var d = sewa ? (parseInt(durasi && durasi.value, 10) || 0) : 1;
       hasil.textContent = 'Rp ' + Math.round(j * harga * d).toLocaleString('id-ID');
+      if (stokAlert) {
+        var maks = parseInt(jumlah.max, 10) || 0;
+        stokAlert.hidden = j <= maks;
+      }
     };
 
     jumlah.addEventListener('input', hitung);

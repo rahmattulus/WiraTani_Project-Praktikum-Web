@@ -48,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$cek_musim->get_result()->fetch_assoc()) {
         $error['musim_tanam_id'] = 'Musim tanam tidak valid atau sudah selesai.';
     }
-    if ($jumlah < 1 || $jumlah > (int) $produk['stok']) {
+    if ($jumlah > (int) $produk['stok']) {
+        $error['jumlah'] = 'Jumlah yang anda butuhkan melebihi stock yang tersedia';
+    } elseif ($jumlah < 1) {
         $error['jumlah'] = 'Jumlah harus tersedia dalam stok.';
     }
     if ($sewa) {
@@ -129,6 +131,10 @@ include __DIR__ . '/../../includes/sidebar.php';
           <div class="card-head">
             <h2 class="card-title">Detail pesanan</h2>
           </div>
+          <div class="alert alert-error" id="jumlah-stok-alert" role="alert"
+               <?= !isset($error['jumlah']) || $error['jumlah'] !== 'Jumlah yang anda butuhkan melebihi stock yang tersedia' ? 'hidden' : '' ?>>
+            Jumlah yang anda butuhkan melebihi stock yang tersedia
+          </div>
 
           <?php if (!$musim_berjalan): ?>
             <div class="empty-state">
@@ -154,9 +160,9 @@ include __DIR__ . '/../../includes/sidebar.php';
 
                 <div class="form-group">
                   <label for="jumlah"><?= $sewa ? 'Jumlah unit' : 'Jumlah (' . e($produk['satuan']) . ')' ?></label>
-                  <input class="input" type="number" id="jumlah" name="jumlah" min="1" max="<?= (int) $produk['stok'] ?>"
+                  <input class="input" type="number" id="jumlah" name="jumlah" min="1" max="<?= (int) $produk['stok'] ?> novalidate"
                          step="1" value="1" required>
-                  <?php if (isset($error)) tampil_error($error, 'jumlah'); ?>
+                  <!-- <#?php if (isset($error)) tampil_error($error, 'jumlah'); ?> -->
                 </div>
 
                 <?php if ($sewa): ?>

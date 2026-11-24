@@ -14,9 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $lock = $koneksi->prepare(
                 'SELECT ps.*, p.user_id AS kios_user_id, p.nama_produk, p.kategori,
-                        p.stok AS stok_produk
+                        p.satuan, p.stok AS stok_produk, u.nama AS nama_petani
                  FROM pesanan_saprotan ps
                  JOIN produk_saprotan p ON p.id = ps.produk_saprotan_id
+                 JOIN users u ON u.id = ps.user_id
                  WHERE ps.id = ? FOR UPDATE'
             );
             $lock->bind_param('i', $pesanan_id);
@@ -68,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new RuntimeException('Pesanan harus berstatus disetujui sebelum diselesaikan.');
                 }
                 $tanggal = date('Y-m-d');
+                $jumlah_satuan = $pesanan['kategori'] === 'sewa_alat'
+                    ? 'unit'
+                    : $pesanan['satuan'];
                 $catat = catat_transaksi(
                     $koneksi,
                     (int) $pesanan['musim_tanam_id'],
@@ -75,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     kategori_keuangan($pesanan['kategori']),
                     (float) $pesanan['total_harga'],
                     $tanggal,
-                    'Pembayaran saprotan: ' . $pesanan['nama_produk'],
+                    'Pembayaran saprotan: ' . $pesanan['nama_produk'] . ' ' .
+                        (int) $pesanan['jumlah'] . ' ' . $jumlah_satuan,
                     null,
                     $pesanan_id
                 );
@@ -87,7 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 $ubah->bind_param('i', $pesanan_id);
                 $ubah->execute();
-                set_flash('success', 'Pesanan selesai dan biaya tercatat di ERP petani.');
+                set_flash(
+                    'success',
+                    'Pesanan ' . $pesanan['nama_produk'] . ' untuk ' . $pesanan['nama_petani'] . ' selesai diproses.'
+                );
             }
             $koneksi->commit();
         } catch (Throwable $ex) {
@@ -204,7 +212,7 @@ include __DIR__ . '/../includes/sidebar.php';
                             <small class="form-error">Stok tersisa <?= (int) $ps['stok'] ?> <?= e($ps['kategori'] === 'sewa_alat' ? 'unit' : $ps['satuan']) ?>, kurang dari jumlah pesanan.</small>
                           <?php endif; ?>
                         <?php elseif ($ps['status'] === 'disetujui'): ?>
-                          <form method="post" action="" data-confirm="Tandai selesai? Biaya akan tercatat di keuangan petani.">
+                          <form method="post" action="" data-confirm="Pastikan petani sudah melakukan pembayaran sebelum menandai pesanan ini selesai.">
                             <?= csrf_field() ?>
                               <input type="hidden" name="id" value="<?= (int) $ps['id'] ?>">
                             <input type="hidden" name="aksi" value="selesai">
