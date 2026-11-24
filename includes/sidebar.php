@@ -2,7 +2,7 @@
 /*
  * sidebar.php: sidebar per role + topbar + pembuka area konten.
  * CATATAN: versi SEMENTARA agar halaman Marvian bisa jalan. PIC asli: Agung (S05).
- * Ikon memakai emoji sebagai cadangan (ikon SVG ada di includes/icons.php milik Agung).
+ * Ikon menu menggunakan aset SVG dari assets/img/.
  *
  * Variabel dari halaman pemanggil: $judul_halaman, $menu_aktif (kunci menu).
  */
@@ -11,26 +11,28 @@ $menu_aktif    = $menu_aktif ?? '';
 
 $semua_menu = [
     'petani' => [
-        ['dashboard', 'Dashboard',    'index.php',     '📊'],
-        ['lelang',    'Lelang Panen', 'lelang/', '🌾'],
-        ['erp',       'ERP Keuangan', 'erp/',       '💰'],
-        ['musim',     'Musim Tanam',  'musim/',     '📅'],
-        ['saprotan',  'Saprotan',     'saprotan/',  '🛒'],
-        ['lowongan',  'Lowongan',     'lowongan/', '👷'],
+        ['dashboard', 'Dashboard',    'index.php',  'dashboard.svg'],
+        ['lelang',    'Lelang Panen', 'lelang/',    'lelang.svg'],
+        ['erp',       'ERP Keuangan', 'erp/',       'erp.svg'],
+        ['musim',     'Musim Tanam',  'musim/',     'musim.svg'],
+        ['saprotan',  'Saprotan',     'saprotan/',  'saprotan.svg'],
+        ['lowongan',  'Lowongan',     'lowongan/',  'lowongan.svg'],
     ],
     'tengkulak' => [
-        ['dashboard', 'Dashboard',       'index.php',     '📊'],
-        ['pasar',     'Pasar Lelang',    'pasar/', '🏷️'],
+        ['dashboard', 'Dashboard',    'index.php', 'dashboard.svg'],
+        ['pasar',     'Pasar Lelang', 'pasar/',   'pasar.svg'],
     ],
     'kios' => [
-        ['dashboard', 'Dashboard',      'index.php',     '📊'],
-        ['produk',    'Produk',         'produk.php',    '📦'],
-        ['pesanan',   'Pesanan Masuk',  'pesanan.php',   '📥'],
+        ['dashboard', 'Dashboard',     'index.php',  'dashboard.svg'],
+        ['produk',    'Produk',        'produk.php', 'produk.svg'],
+        ['pesanan',   'Pesanan Masuk', 'pesanan.php','pesanan.svg'],
     ],
 ];
 ?>
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><span aria-hidden="true">🌾</span> WiraTani</div>
+    <div class="brand"><span aria-hidden="true">
+      <img src="<?= BASE_URL ?>/assets/img/wiratani-icon.svg" alt="WiraTani" height="40">
+    </span> WiraTani</div>
     <nav aria-label="Menu <?= e($role_sekarang) ?>">
       <ul class="nav-list">
 <?php foreach ($semua_menu[$role_sekarang] as [$kunci, $label, $berkas, $ikon]): ?>
@@ -38,14 +40,18 @@ $semua_menu = [
           <a class="nav-item<?= $kunci === $menu_aktif ? ' active' : '' ?>"
              href="<?= BASE_URL . '/' . e($role_sekarang) . '/' . $berkas ?>"
              <?= $kunci === $menu_aktif ? 'aria-current="page"' : '' ?>>
-            <span class="icon" aria-hidden="true"><?= $ikon ?></span><?= e($label) ?>
+            <span class="icon" aria-hidden="true">
+              <img src="<?= BASE_URL ?>/assets/img/<?= e($ikon) ?>?v=2" alt="" width="20" height="20">
+            </span><?= e($label) ?>
           </a>
         </li>
 <?php endforeach; ?>
         <li class="nav-divider" role="separator"></li>
         <li>
           <a class="nav-item" href="<?= BASE_URL ?>/auth/logout.php">
-            <span class="icon" aria-hidden="true">🚪</span>Keluar
+            <span class="icon" aria-hidden="true">
+              <img src="<?= BASE_URL ?>/assets/img/logout.svg?v=2" alt="" width="20" height="20">
+            </span>Keluar
           </a>
         </li>
       </ul>

@@ -4,6 +4,24 @@ $layout = $layout ?? 'app';
 ?>
 <?php if ($layout === 'publik'): ?>
   </main>
+  <?php if (basename($_SERVER['PHP_SELF']) === 'index.php'): ?>
+  <footer class="public-footer">
+    <div class="public-footer-inner">
+      <a class="public-footer-brand" href="<?= BASE_URL ?>/index.php">
+        <img src="<?= BASE_URL ?>/assets/img/wiratani-icon.svg" alt="WiraTani" height="40" >
+        <span>WiraTani</span>
+      </a>
+      <nav class="public-footer-links" aria-label="Tautan footer">
+        <a href="<?= BASE_URL ?>/index.php#masalah">Tentang</a>
+        <a href="<?= BASE_URL ?>/publik/bursa.php">Bursa Kerja</a>
+        <a href="<?= BASE_URL ?>/auth/login.php">Masuk</a>
+      </nav>
+    </div>
+    <div class="public-footer-bottom">
+      <p>&copy; <?= date('Y') ?> WiraTani. Semua hak dilindungi.</p>
+    </div>
+  </footer>
+  <?php endif; ?>
 <?php else: ?>
     </main>
   </div>
