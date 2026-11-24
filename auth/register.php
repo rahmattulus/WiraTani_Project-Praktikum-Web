@@ -97,9 +97,6 @@ $layout        = 'publik';
 $judul_halaman = 'Daftar';
 include __DIR__ . '/../includes/header.php';
 ?>
-    <!-- EDIT: kalau header.php punya tempat khusus CSS tambahan, pindahkan baris ini ke sana -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/auth_redesain.css">
-
     <div class="au-wrap au-wrap--wide">
       <div class="au-shell au-shell--wide">
         <?php au_panel('Bergabung dengan WiraTani', 'Pilih peranmu, lengkapi data diri, dan mulai bertransaksi secara terbuka dan tercatat.'); ?>

@@ -81,11 +81,11 @@ $wt_faq = [
     ['Dari mana pendapatan di catatan keuangan berasal?', 'Pendapatan terekap otomatis dari lelang panen yang berhasil. Biaya seperti pupuk, bibit, dan sewa alat dicatat petani pada musim tanam yang bersangkutan.'],
 ];
 
-// 8. Tim  (EDIT: ganti dengan nama dan peran asli)
+// 8. Tim
 $wt_tim = [
-    ['A', 'Nama Anggota 1', 'Peran, misalnya Modul Petani dan ERP'],
-    ['B', 'Nama Anggota 2', 'Peran, misalnya Modul Tengkulak dan Lelang'],
-    ['C', 'Nama Anggota 3', 'Peran, misalnya Modul Kios Tani dan Bursa Kerja'],
+    ['D', 'Dwi Marvian', 'H1D025063'],
+    ['E', 'Eko Rahmat Tulus Subarkah', 'H1D025064'],
+    ['A', 'Agung Barkah Syahputra', 'H1D025080'],
 ];
 
 
@@ -323,6 +323,22 @@ include __DIR__ . '/includes/header.php';
     </div>
   </section>
 
+  <!-- 8. TIM -->
+  <section id="tim" class="wt-block">
+    <div class="wt-head">
+      <span class="wt-eyebrow">Tim pengembang</span>
+      <h2>Orang di balik WiraTani</h2>
+    </div>
+    <div class="wt-grid wt-grid-3">
+      <?php foreach ($wt_tim as [$inisial, $nama, $nim]): ?>
+        <article class="wt-card wt-team">
+          <div class="wt-avatar" aria-hidden="true"><?= e($inisial) ?></div>
+          <h3><?= e($nama) ?></h3>
+          <p><?= e($nim) ?></p>
+        </article>
+      <?php endforeach; ?>
+    </div>
+  </section>
 
 </div>
 <?php include __DIR__ . '/includes/footer.php'; ?>

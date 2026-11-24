@@ -111,9 +111,6 @@ $layout = 'publik';
 $judul_halaman = 'Bursa Kerja Buruh Tani';
 include __DIR__ . '/../includes/header.php';
 ?>
-    <!-- EDIT: kalau header.php punya tempat khusus CSS tambahan, pindahkan baris ini ke sana -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bursa_redesain.css">
-
     <div class="bk-page">
 
       <!-- HERO + STATISTIK -->

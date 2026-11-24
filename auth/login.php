@@ -51,9 +51,6 @@ $layout        = 'publik';
 $judul_halaman = 'Masuk';
 include __DIR__ . '/../includes/header.php';
 ?>
-    <!-- EDIT: kalau header.php punya tempat khusus CSS tambahan, pindahkan baris ini ke sana -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/auth_redesain.css">
-
     <div class="au-wrap">
       <div class="au-shell">
         <?php au_panel('Selamat datang kembali', 'Masuk untuk mengelola lelang, catatan keuangan, pesanan, atau lowongan kerjamu.'); ?>

@@ -101,9 +101,6 @@ $layout = 'publik';
 $judul_halaman = $lowongan_detail ? $lowongan_detail['judul'] : 'Lowongan Tidak Tersedia';
 include __DIR__ . '/../includes/header.php';
 ?>
-    <!-- EDIT: kalau header.php punya tempat khusus CSS tambahan, pindahkan baris ini ke sana -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/detail_lowongan.css">
-
     <div class="bd-page">
       <a class="bd-back" href="<?= e($url_bursa) ?>"><?= bk_ikon('back') ?> Kembali ke bursa kerja</a>
 

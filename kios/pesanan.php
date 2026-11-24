@@ -32,38 +32,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($pesanan['status'] !== 'menunggu') {
                     throw new RuntimeException('Pesanan sudah tidak berstatus menunggu.');
                 }
-                if ((int) $pesanan['jumlah'] > (int) $pesanan['stok_produk']) {
-                    throw new RuntimeException('Stok tidak cukup untuk menyetujui pesanan.');
-                }
-                $kurang = $koneksi->prepare(
-                    'UPDATE produk_saprotan SET stok = stok - ? WHERE id = ? AND stok >= ?'
-                );
-                $kurang->bind_param(
-                    'iii',
-                    $pesanan['jumlah'],
-                    $pesanan['produk_saprotan_id'],
-                    $pesanan['jumlah']
-                );
-                $kurang->execute();
-                if ($kurang->affected_rows !== 1) {
-                    throw new RuntimeException('Stok berubah saat pesanan diproses.');
+                if (!(int) $pesanan['stok_direservasi']) {
+                    if ((int) $pesanan['jumlah'] > (int) $pesanan['stok_produk']) {
+                        throw new RuntimeException('Stok tidak cukup untuk menyetujui pesanan lama.');
+                    }
+                    $kurang = $koneksi->prepare(
+                        'UPDATE produk_saprotan SET stok = stok - ? WHERE id = ? AND stok >= ?'
+                    );
+                    $kurang->bind_param(
+                        'iii',
+                        $pesanan['jumlah'],
+                        $pesanan['produk_saprotan_id'],
+                        $pesanan['jumlah']
+                    );
+                    $kurang->execute();
+                    if ($kurang->affected_rows !== 1) {
+                        throw new RuntimeException('Stok berubah saat pesanan diproses.');
+                    }
                 }
                 $ubah = $koneksi->prepare(
-                    'UPDATE pesanan_saprotan SET status = "disetujui" WHERE id = ?'
+                    'UPDATE pesanan_saprotan
+                     SET status = "disetujui", stok_direservasi = 0
+                     WHERE id = ? AND status = "menunggu"'
                 );
                 $ubah->bind_param('i', $pesanan_id);
                 $ubah->execute();
-                set_flash('success', 'Pesanan disetujui dan stok berhasil dikurangi.');
+                set_flash('success', 'Pesanan disetujui.');
             } elseif ($aksi === 'tolak') {
                 if ($pesanan['status'] !== 'menunggu') {
                     throw new RuntimeException('Pesanan sudah diproses dan tidak dapat ditolak.');
                 }
+                if ((int) $pesanan['stok_direservasi']) {
+                    $kembali = $koneksi->prepare(
+                        'UPDATE produk_saprotan
+                         SET stok = stok + ?
+                         WHERE id = ? AND stok <= 4294967295 - ?'
+                    );
+                    $kembali->bind_param(
+                        'iii',
+                        $pesanan['jumlah'],
+                        $pesanan['produk_saprotan_id'],
+                        $pesanan['jumlah']
+                    );
+                    $kembali->execute();
+                    if ($kembali->affected_rows !== 1) {
+                        throw new RuntimeException('Stok gagal dikembalikan. Periksa stok dan coba lagi.');
+                    }
+                }
                 $ubah = $koneksi->prepare(
-                    'UPDATE pesanan_saprotan SET status = "ditolak" WHERE id = ?'
+                    'UPDATE pesanan_saprotan
+                     SET status = "ditolak", stok_direservasi = 0
+                     WHERE id = ? AND status = "menunggu"'
                 );
                 $ubah->bind_param('i', $pesanan_id);
                 $ubah->execute();
-                set_flash('success', 'Pesanan ditolak.');
+                set_flash('success', 'Pesanan ditolak dan stok reservasi dikembalikan.');
             } elseif ($aksi === 'selesai') {
                 if ($pesanan['status'] !== 'disetujui') {
                     throw new RuntimeException('Pesanan harus berstatus disetujui sebelum diselesaikan.');
@@ -175,7 +198,8 @@ include __DIR__ . '/../includes/sidebar.php';
                 <tbody>
                   <?php foreach ($pesanan as $ps): ?>
                     <?php
-                      $stok_cukup = (int) $ps['jumlah'] <= (int) $ps['stok'];
+                      $stok_cukup = (int) $ps['stok_direservasi'] === 1
+                          || (int) $ps['jumlah'] <= (int) $ps['stok'];
                     ?>
                     <tr>
                       <td data-label="Tanggal"><?= e(format_tanggal($ps['created_at'])) ?></td>
@@ -195,7 +219,7 @@ include __DIR__ . '/../includes/sidebar.php';
                       <td data-label="Aksi">
                         <?php if ($ps['status'] === 'menunggu'): ?>
                           <div class="table-actions">
-                            <form method="post" action="" data-confirm="Setujui pesanan ini? Stok akan berkurang.">
+                            <form method="post" action="" data-confirm="Setujui pesanan ini? Sistem akan memastikan stok tersedia.">
                               <?= csrf_field() ?>
                               <input type="hidden" name="id" value="<?= (int) $ps['id'] ?>">
                               <input type="hidden" name="aksi" value="setujui">

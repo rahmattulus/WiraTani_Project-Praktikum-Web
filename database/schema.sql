@@ -3,6 +3,11 @@
 -- Mengacu pada PRD-web-pertanian.md (bagian 6, 7, 8)
 -- MySQL 5.7+ / MariaDB 10.3+ (InnoDB, utf8mb4)
 --
+-- Setup ulang database development:
+--   Jalankan seluruh file ini. Skema terbaru, termasuk stok_direservasi,
+--   dibuat dari awal sehingga tidak memerlukan file migrasi terpisah.
+--   Untuk data demo, setelah itu jalankan seed_akun.sql lalu seed_saprotan.sql.
+--
 -- Konvensi:
 --   * PK semua tabel bernama `id`
 --   * FK bernama <tabel_tunggal>_id (mis. hasil_panen_id), kecuali pemilik
@@ -18,7 +23,7 @@ CREATE DATABASE IF NOT EXISTS db_pertanian
 USE db_pertanian;
 
 -- ---------------------------------------------------------------------
--- Reset (aman dijalankan ulang saat development)
+-- Reset (DESTRUKTIF: menghapus seluruh data tabel; hanya untuk development saja)
 -- ---------------------------------------------------------------------
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS transaksi_keuangan;
@@ -145,6 +150,8 @@ CREATE TABLE produk_saprotan (
 --    status: menunggu -> disetujui -> selesai | menunggu -> ditolak
 --    harga_satuan dan total_harga disalin saat pesan (snapshot), supaya
 --    perubahan harga produk tidak mengubah riwayat.
+--    Stok yang dipesan langsung direservasi. Pesanan lama default 0 agar
+--    transisi statusnya tetap memakai perilaku stok sebelum reservasi.
 --    total_harga: produk non-sewa = jumlah x harga_satuan
 --                 sewa_alat       = jumlah x harga_satuan x durasi_hari
 -- ---------------------------------------------------------------------
@@ -160,6 +167,7 @@ CREATE TABLE pesanan_saprotan (
   durasi_hari         INT UNSIGNED NULL COMMENT 'hanya untuk sewa_alat',
   catatan             TEXT NULL,
   status              ENUM('menunggu','disetujui','ditolak','selesai') NOT NULL DEFAULT 'menunggu',
+  stok_direservasi    TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 selama stok pesanan masih direservasi',
   created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
