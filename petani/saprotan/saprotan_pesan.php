@@ -48,9 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$cek_musim->get_result()->fetch_assoc()) {
         $error['musim_tanam_id'] = 'Musim tanam tidak valid atau sudah selesai.';
     }
-    if ($jumlah > (int) $produk['stok']) {
-        $error['jumlah'] = 'Jumlah yang anda butuhkan melebihi stock yang tersedia';
-    } elseif ($jumlah < 1) {
+    if ($jumlah < 1) {
         $error['jumlah'] = 'Jumlah harus tersedia dalam stok.';
     }
     if ($sewa) {
@@ -70,41 +68,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$error) {
-        $harga_satuan = (float) $produk['harga'];
-        $total_harga = hitung_total_pesanan(
-            $produk['kategori'],
-            $harga_satuan,
-            $jumlah,
-            $durasi_hari
-        );
-        if ($sewa) {
-            $insert = $koneksi->prepare(
-                'INSERT INTO pesanan_saprotan
-                 (user_id, produk_saprotan_id, musim_tanam_id, jumlah, harga_satuan, total_harga,
-                  tanggal_mulai_sewa, durasi_hari, catatan, status)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "menunggu")'
+        $transaksi_dimulai = false;
+        try {
+            $koneksi->begin_transaction();
+            $transaksi_dimulai = true;
+
+            $lock = $koneksi->prepare(
+                'SELECT harga, kategori, stok
+                 FROM produk_saprotan
+                 WHERE id = ?
+                 FOR UPDATE'
             );
-            $insert->bind_param(
-                'iiiiddsis',
-                $_SESSION['user_id'], $produk_id, $musim_tanam_id, $jumlah,
-                $harga_satuan, $total_harga, $tanggal_sewa, $durasi_hari, $catatan
+            $lock->bind_param('i', $produk_id);
+            $lock->execute();
+            $produk_terkini = $lock->get_result()->fetch_assoc();
+
+            if (!$produk_terkini) {
+                throw new RuntimeException('Produk sudah tidak tersedia.');
+            }
+            if ($produk_terkini['kategori'] !== $produk['kategori']) {
+                throw new RuntimeException('Data produk berubah. Muat ulang halaman sebelum memesan.');
+            }
+            if ($jumlah > (int) $produk_terkini['stok']) {
+                $produk['stok'] = (int) $produk_terkini['stok'];
+                throw new RuntimeException('Stok tersedia tidak cukup. Periksa kembali jumlah pesanan.');
+            }
+
+            $kurang = $koneksi->prepare(
+                'UPDATE produk_saprotan
+                 SET stok = stok - ?
+                 WHERE id = ? AND stok >= ?'
             );
-        } else {
-            $insert = $koneksi->prepare(
-                'INSERT INTO pesanan_saprotan
-                 (user_id, produk_saprotan_id, musim_tanam_id, jumlah, harga_satuan, total_harga,
-                  tanggal_mulai_sewa, durasi_hari, catatan, status)
-                 VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, "menunggu")'
+            $kurang->bind_param('iii', $jumlah, $produk_id, $jumlah);
+            $kurang->execute();
+            if ($kurang->affected_rows !== 1) {
+                throw new RuntimeException('Stok berubah saat pesanan diproses. Silakan coba lagi.');
+            }
+
+            $harga_satuan = (float) $produk_terkini['harga'];
+            $total_harga = hitung_total_pesanan(
+                $produk_terkini['kategori'],
+                $harga_satuan,
+                $jumlah,
+                $durasi_hari
             );
-            $insert->bind_param(
-                'iiiidds',
-                $_SESSION['user_id'], $produk_id, $musim_tanam_id, $jumlah,
-                $harga_satuan, $total_harga, $catatan
-            );
+            if ($sewa) {
+                $insert = $koneksi->prepare(
+                    'INSERT INTO pesanan_saprotan
+                     (user_id, produk_saprotan_id, musim_tanam_id, jumlah, harga_satuan, total_harga,
+                      tanggal_mulai_sewa, durasi_hari, catatan, status, stok_direservasi)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "menunggu", 1)'
+                );
+                $insert->bind_param(
+                    'iiiiddsis',
+                    $_SESSION['user_id'], $produk_id, $musim_tanam_id, $jumlah,
+                    $harga_satuan, $total_harga, $tanggal_sewa, $durasi_hari, $catatan
+                );
+            } else {
+                $insert = $koneksi->prepare(
+                    'INSERT INTO pesanan_saprotan
+                     (user_id, produk_saprotan_id, musim_tanam_id, jumlah, harga_satuan, total_harga,
+                      tanggal_mulai_sewa, durasi_hari, catatan, status, stok_direservasi)
+                     VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, ?, "menunggu", 1)'
+                );
+                $insert->bind_param(
+                    'iiiidds',
+                    $_SESSION['user_id'], $produk_id, $musim_tanam_id, $jumlah,
+                    $harga_satuan, $total_harga, $catatan
+                );
+            }
+            $insert->execute();
+
+            $koneksi->commit();
+            $transaksi_dimulai = false;
+            set_flash('success', 'Pesanan berhasil dikirim dan stok telah direservasi.');
+            redirect('saprotan_riwayat.php');
+        } catch (Throwable $ex) {
+            if ($transaksi_dimulai) {
+                $koneksi->rollback();
+            }
+            if ($ex instanceof RuntimeException) {
+                $error['form'] = $ex->getMessage();
+            } else {
+                error_log('Gagal membuat pesanan saprotan: ' . $ex->getMessage());
+                $error['form'] = 'Pesanan gagal dikirim. Silakan coba lagi.';
+            }
         }
-        $insert->execute();
-        set_flash('success', 'Pesanan berhasil dikirim dan menunggu persetujuan kios.');
-        redirect('saprotan_riwayat.php');
     }
 }
 
@@ -131,6 +180,9 @@ include __DIR__ . '/../../includes/sidebar.php';
           <div class="card-head">
             <h2 class="card-title">Detail pesanan</h2>
           </div>
+          <?php if (isset($error['form'])): ?>
+            <div class="alert alert-error" role="alert"><?= e($error['form']) ?></div>
+          <?php endif; ?>
           <div class="alert alert-error" id="jumlah-stok-alert" role="alert"
                <?= !isset($error['jumlah']) || $error['jumlah'] !== 'Jumlah yang anda butuhkan melebihi stock yang tersedia' ? 'hidden' : '' ?>>
             Jumlah yang anda butuhkan melebihi stock yang tersedia
@@ -160,9 +212,9 @@ include __DIR__ . '/../../includes/sidebar.php';
 
                 <div class="form-group">
                   <label for="jumlah"><?= $sewa ? 'Jumlah unit' : 'Jumlah (' . e($produk['satuan']) . ')' ?></label>
-                  <input class="input" type="number" id="jumlah" name="jumlah" min="1" max="<?= (int) $produk['stok'] ?> novalidate"
+                  <input class="input" type="number" id="jumlah" name="jumlah" min="1" max="<?= (int) $produk['stok'] ?>"
                          step="1" value="1" required>
-                  <!-- <#?php if (isset($error)) tampil_error($error, 'jumlah'); ?> -->
+                  <?php if (isset($error)) tampil_error($error, 'jumlah'); ?>
                 </div>
 
                 <?php if ($sewa): ?>
