@@ -124,14 +124,14 @@ Satu akun hanya punya satu role. Role dipilih saat registrasi.
 
 * Melihat katalog dari seluruh kios (filter kategori, nama kios, lokasi).
 * Membuat pesanan: pilih produk, jumlah, untuk sewa alat tambahkan tanggal mulai dan durasi (hari), catatan.
-* Pesanan mengurangi/mereservasi stok saat disetujui kios (lihat 6.8).
+* Pesanan mereservasi stok tersedia saat dibuat. Persetujuan kios mempertahankan reservasi tanpa mengurangi stok lagi; penolakan mengembalikan stok tersedia.
 * Petani melihat riwayat dan status pesanannya.
 
 ### 6.8 Katalog, Stok, dan Pesanan Kios
 
 * CRUD produk: nama, kategori (`pupuk`, `bibit`, `pestisida`, `sewa\_alat`), harga satuan, satuan (kg/sak/hari), stok, deskripsi.
 * Pesanan masuk: daftar pesanan dengan aksi `setujui`, `tolak`, `tandai selesai`.
-* Menyetujui pesanan mengurangi stok; jika stok tidak cukup, aksi ditolak sistem.
+* Stok tersedia dikurangi secara atomik saat pesanan dibuat; pesanan tidak dapat dibuat jika stok tidak cukup. Menyetujui pesanan tidak mengurangi stok lagi, sedangkan menolak pesanan mengembalikan stok yang direservasi.
 * Pesanan `selesai` memicu pencatatan biaya ke ERP petani (lihat 6.6).
 
 ### 6.9 Lowongan Kerja Buruh Tani (Petani)

@@ -62,7 +62,8 @@ function tampil_flash(): void
 function tampil_error(array $error, string $field): void
 {
     if (isset($error[$field])) {
-        echo '<p class="form-error">' . e($error[$field]) . '</p>';
+        echo '<p class="form-error" id="error-' . e($field) . '" role="alert">'
+            . e($error[$field]) . '</p>';
     }
 }
 
@@ -90,4 +91,68 @@ function inisial(string $nama): string
         $hasil .= strtoupper(substr($k, 0, 1));
     }
     return $hasil !== '' ? $hasil : '?';
+}
+
+/*
+ * Mencatat satu transaksi ERP tanpa memulai transaksi database.
+ * Pemanggil wajib mengelola begin_transaction() / commit() / rollback().
+ */
+function catat_transaksi(
+    mysqli $koneksi,
+    int $musim_tanam_id,
+    string $jenis,
+    string $kategori,
+    float $nominal,
+    string $tanggal,
+    ?string $keterangan = null,
+    ?int $hasil_panen_id = null,
+    ?int $pesanan_saprotan_id = null
+): bool {
+    if (!in_array($jenis, ['pendapatan', 'pengeluaran'], true)
+        || !in_array($kategori, ['hasil_lelang', 'bibit', 'pupuk', 'pestisida', 'alat', 'tenaga_kerja', 'lainnya'], true)
+        || $nominal <= 0
+        || $musim_tanam_id <= 0
+    ) {
+        return false;
+    }
+
+    if ($hasil_panen_id !== null && $pesanan_saprotan_id === null) {
+        $stmt = $koneksi->prepare(
+            'INSERT INTO transaksi_keuangan
+             (musim_tanam_id, jenis, kategori, nominal, tanggal, keterangan, hasil_panen_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->bind_param('issdssi', $musim_tanam_id, $jenis, $kategori, $nominal, $tanggal, $keterangan, $hasil_panen_id);
+    } elseif ($hasil_panen_id === null && $pesanan_saprotan_id !== null) {
+        $stmt = $koneksi->prepare(
+            'INSERT INTO transaksi_keuangan
+             (musim_tanam_id, jenis, kategori, nominal, tanggal, keterangan, pesanan_saprotan_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->bind_param('issdssi', $musim_tanam_id, $jenis, $kategori, $nominal, $tanggal, $keterangan, $pesanan_saprotan_id);
+    } elseif ($hasil_panen_id === null && $pesanan_saprotan_id === null) {
+        $stmt = $koneksi->prepare(
+            'INSERT INTO transaksi_keuangan
+             (musim_tanam_id, jenis, kategori, nominal, tanggal, keterangan)
+             VALUES (?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->bind_param('issdss', $musim_tanam_id, $jenis, $kategori, $nominal, $tanggal, $keterangan);
+    } else {
+        $stmt = $koneksi->prepare(
+            'INSERT INTO transaksi_keuangan
+             (musim_tanam_id, jenis, kategori, nominal, tanggal, keterangan, hasil_panen_id, pesanan_saprotan_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->bind_param('issdssii', $musim_tanam_id, $jenis, $kategori, $nominal, $tanggal, $keterangan, $hasil_panen_id, $pesanan_saprotan_id);
+    }
+
+    try {
+        $stmt->execute();
+        return true;
+    } catch (mysqli_sql_exception $ex) {
+        if ((int) $ex->getCode() === 1062) {
+            return false;
+        }
+        throw $ex;
+    }
 }

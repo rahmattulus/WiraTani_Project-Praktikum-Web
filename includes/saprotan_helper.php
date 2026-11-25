@@ -1,7 +1,7 @@
 <?php
 /*
  * saprotan_helper.php (Marvian): label, badge, dan hitung total untuk modul saprotan.
- * Berkas ini TETAP dipakai setelah Fase 3 (tidak seperti dummy_saprotan.php).
+ * Berkas pembantu yang dipakai oleh katalog, pesanan, dan riwayat saprotan.
  */
 
 const KATEGORI_SAPROTAN = [
@@ -18,7 +18,7 @@ const STATUS_PESANAN = [
     'selesai'   => 'Selesai',
 ];
 
-const STOK_MENIPIS = 10;
+const STOK_MENIPIS = 5;
 
 function label_kategori(string $kategori): string
 {

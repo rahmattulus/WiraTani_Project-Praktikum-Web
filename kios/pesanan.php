@@ -1,20 +1,130 @@
 <?php
-/* Kios: pesanan masuk dari petani (S12, Marvian). UI dengan data dummy. */
+/* Kios: pesanan masuk dari petani (S12/S25, Marvian). */
 require_once __DIR__ . '/../includes/auth_guard.php';
 wajib_login('kios');
 require_once __DIR__ . '/../includes/saprotan_helper.php';
-require_once __DIR__ . '/../includes/dummy_saprotan.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     wajib_csrf('pesanan.php');
     $aksi  = input_teks($_POST, 'aksi');
-    $nama  = ['setujui' => 'Setujui pesanan', 'tolak' => 'Tolak pesanan', 'selesai' => 'Tandai pesanan selesai'];
-    if (isset($nama[$aksi])) {
-        // TODO S21 (satu transaksi database):
-        //   setujui: cek stok cukup, kurangi stok, status = 'disetujui'
-        //   tolak:   status = 'ditolak'
-        //   selesai: status = 'selesai' + catat_transaksi() pengeluaran ke ERP petani
-        aksi_mode_ui($nama[$aksi], 'pesanan.php');
+    $pesanan_id = (int) input_teks($_POST, 'id');
+    if ($pesanan_id > 0 && isset(['setujui' => 1, 'tolak' => 1, 'selesai' => 1][$aksi])) {
+        $koneksi->begin_transaction();
+        try {
+            $lock = $koneksi->prepare(
+                'SELECT ps.*, p.user_id AS kios_user_id, p.nama_produk, p.kategori,
+                        p.satuan, p.stok AS stok_produk, u.nama AS nama_petani
+                 FROM pesanan_saprotan ps
+                 JOIN produk_saprotan p ON p.id = ps.produk_saprotan_id
+                 JOIN users u ON u.id = ps.user_id
+                 WHERE ps.id = ? FOR UPDATE'
+            );
+            $lock->bind_param('i', $pesanan_id);
+            $lock->execute();
+            $pesanan = $lock->get_result()->fetch_assoc();
+
+            if (!$pesanan || (int) $pesanan['kios_user_id'] !== (int) $_SESSION['user_id']) {
+                throw new RuntimeException('Pesanan tidak ditemukan atau bukan milik kios Anda.');
+            }
+
+            if ($aksi === 'setujui') {
+                if ($pesanan['status'] !== 'menunggu') {
+                    throw new RuntimeException('Pesanan sudah tidak berstatus menunggu.');
+                }
+                if (!(int) $pesanan['stok_direservasi']) {
+                    if ((int) $pesanan['jumlah'] > (int) $pesanan['stok_produk']) {
+                        throw new RuntimeException('Stok tidak cukup untuk menyetujui pesanan lama.');
+                    }
+                    $kurang = $koneksi->prepare(
+                        'UPDATE produk_saprotan SET stok = stok - ? WHERE id = ? AND stok >= ?'
+                    );
+                    $kurang->bind_param(
+                        'iii',
+                        $pesanan['jumlah'],
+                        $pesanan['produk_saprotan_id'],
+                        $pesanan['jumlah']
+                    );
+                    $kurang->execute();
+                    if ($kurang->affected_rows !== 1) {
+                        throw new RuntimeException('Stok berubah saat pesanan diproses.');
+                    }
+                }
+                $ubah = $koneksi->prepare(
+                    'UPDATE pesanan_saprotan
+                     SET status = "disetujui", stok_direservasi = 0
+                     WHERE id = ? AND status = "menunggu"'
+                );
+                $ubah->bind_param('i', $pesanan_id);
+                $ubah->execute();
+                set_flash('success', 'Pesanan disetujui.');
+            } elseif ($aksi === 'tolak') {
+                if ($pesanan['status'] !== 'menunggu') {
+                    throw new RuntimeException('Pesanan sudah diproses dan tidak dapat ditolak.');
+                }
+                if ((int) $pesanan['stok_direservasi']) {
+                    $kembali = $koneksi->prepare(
+                        'UPDATE produk_saprotan
+                         SET stok = stok + ?
+                         WHERE id = ? AND stok <= 4294967295 - ?'
+                    );
+                    $kembali->bind_param(
+                        'iii',
+                        $pesanan['jumlah'],
+                        $pesanan['produk_saprotan_id'],
+                        $pesanan['jumlah']
+                    );
+                    $kembali->execute();
+                    if ($kembali->affected_rows !== 1) {
+                        throw new RuntimeException('Stok gagal dikembalikan. Periksa stok dan coba lagi.');
+                    }
+                }
+                $ubah = $koneksi->prepare(
+                    'UPDATE pesanan_saprotan
+                     SET status = "ditolak", stok_direservasi = 0
+                     WHERE id = ? AND status = "menunggu"'
+                );
+                $ubah->bind_param('i', $pesanan_id);
+                $ubah->execute();
+                set_flash('success', 'Pesanan ditolak dan stok reservasi dikembalikan.');
+            } elseif ($aksi === 'selesai') {
+                if ($pesanan['status'] !== 'disetujui') {
+                    throw new RuntimeException('Pesanan harus berstatus disetujui sebelum diselesaikan.');
+                }
+                $tanggal = date('Y-m-d');
+                $jumlah_satuan = $pesanan['kategori'] === 'sewa_alat'
+                    ? 'unit'
+                    : $pesanan['satuan'];
+                $catat = catat_transaksi(
+                    $koneksi,
+                    (int) $pesanan['musim_tanam_id'],
+                    'pengeluaran',
+                    kategori_keuangan($pesanan['kategori']),
+                    (float) $pesanan['total_harga'],
+                    $tanggal,
+                    'Pembayaran saprotan: ' . $pesanan['nama_produk'] . ' ' .
+                        (int) $pesanan['jumlah'] . ' ' . $jumlah_satuan,
+                    null,
+                    $pesanan_id
+                );
+                if (!$catat) {
+                    throw new RuntimeException('Biaya pesanan sudah pernah tercatat atau tidak valid.');
+                }
+                $ubah = $koneksi->prepare(
+                    'UPDATE pesanan_saprotan SET status = "selesai" WHERE id = ?'
+                );
+                $ubah->bind_param('i', $pesanan_id);
+                $ubah->execute();
+                set_flash(
+                    'success',
+                    'Pesanan ' . $pesanan['nama_produk'] . ' untuk ' . $pesanan['nama_petani'] . ' selesai diproses.'
+                );
+            }
+            $koneksi->commit();
+        } catch (Throwable $ex) {
+            $koneksi->rollback();
+            set_flash('error', $ex instanceof RuntimeException ? $ex->getMessage() : 'Gagal memproses pesanan.');
+        }
     }
     redirect('pesanan.php');
 }
@@ -24,19 +134,24 @@ if (!isset(STATUS_PESANAN[$status])) {
     $status = '';
 }
 
-// TODO S21: JOIN pesanan_saprotan, produk_saprotan, users WHERE produk_saprotan.user_id = ?
-$pesanan = [];
-foreach ($dummy_pesanan as $ps) {
-    $produk = cari_produk($ps['produk_saprotan_id']);
-    if (!$produk || $produk['user_id'] !== $dummy_user_kios) {
-        continue;
-    }
-    if ($status !== '' && $ps['status'] !== $status) {
-        continue;
-    }
-    $ps['produk'] = $produk;
-    $pesanan[]    = $ps;
+$sql = 'SELECT ps.*, p.nama_produk, p.kategori, p.satuan, p.stok,
+               u.nama AS nama_petani
+        FROM pesanan_saprotan ps
+        JOIN produk_saprotan p ON p.id = ps.produk_saprotan_id
+        JOIN users u ON u.id = ps.user_id
+        WHERE p.user_id = ?';
+$params = [$_SESSION['user_id']];
+$types = 'i';
+if ($status !== '') {
+    $sql .= ' AND ps.status = ?';
+    $params[] = $status;
+    $types .= 's';
 }
+$sql .= ' ORDER BY ps.created_at DESC, ps.id DESC';
+$stmt = $koneksi->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$pesanan = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $judul_halaman = 'Pesanan Masuk';
 $menu_aktif    = 'pesanan';
@@ -83,28 +198,28 @@ include __DIR__ . '/../includes/sidebar.php';
                 <tbody>
                   <?php foreach ($pesanan as $ps): ?>
                     <?php
-                      $p          = $ps['produk'];
-                      $stok_cukup = $ps['jumlah'] <= $p['stok'];
+                      $stok_cukup = (int) $ps['stok_direservasi'] === 1
+                          || (int) $ps['jumlah'] <= (int) $ps['stok'];
                     ?>
                     <tr>
                       <td data-label="Tanggal"><?= e(format_tanggal($ps['created_at'])) ?></td>
                       <td data-label="Petani"><?= e($ps['nama_petani']) ?></td>
                       <td data-label="Produk">
-                        <?= e($p['nama_produk']) ?>
-                        <?php if ($p['kategori'] === 'sewa_alat'): ?>
+                        <?= e($ps['nama_produk']) ?>
+                        <?php if ($ps['kategori'] === 'sewa_alat'): ?>
                           <br><small>Mulai sewa <?= e(format_tanggal($ps['tanggal_mulai_sewa'])) ?>, <?= (int) $ps['durasi_hari'] ?> hari</small>
                         <?php endif; ?>
                         <?php if ($ps['catatan'] !== ''): ?>
                           <br><small>Catatan: <?= e($ps['catatan']) ?></small>
                         <?php endif; ?>
                       </td>
-                      <td data-label="Jumlah"><?= (int) $ps['jumlah'] ?> <?= e($p['kategori'] === 'sewa_alat' ? 'unit' : $p['satuan']) ?></td>
+                      <td data-label="Jumlah"><?= (int) $ps['jumlah'] ?> <?= e($ps['kategori'] === 'sewa_alat' ? 'unit' : $ps['satuan']) ?></td>
                       <td data-label="Total"><?= e(format_rupiah($ps['total_harga'])) ?></td>
                       <td data-label="Status"><?= badge_pesanan($ps['status']) ?></td>
                       <td data-label="Aksi">
                         <?php if ($ps['status'] === 'menunggu'): ?>
                           <div class="table-actions">
-                            <form method="post" action="" data-confirm="Setujui pesanan ini? Stok akan berkurang.">
+                            <form method="post" action="" data-confirm="Setujui pesanan ini? Sistem akan memastikan stok tersedia.">
                               <?= csrf_field() ?>
                               <input type="hidden" name="id" value="<?= (int) $ps['id'] ?>">
                               <input type="hidden" name="aksi" value="setujui">
@@ -118,10 +233,10 @@ include __DIR__ . '/../includes/sidebar.php';
                             </form>
                           </div>
                           <?php if (!$stok_cukup): ?>
-                            <small class="form-error">Stok tersisa <?= e(teks_stok($p)) ?>, kurang dari jumlah pesanan.</small>
+                            <small class="form-error">Stok tersisa <?= (int) $ps['stok'] ?> <?= e($ps['kategori'] === 'sewa_alat' ? 'unit' : $ps['satuan']) ?>, kurang dari jumlah pesanan.</small>
                           <?php endif; ?>
                         <?php elseif ($ps['status'] === 'disetujui'): ?>
-                          <form method="post" action="" data-confirm="Tandai selesai? Biaya akan tercatat di keuangan petani.">
+                          <form method="post" action="" data-confirm="Pastikan petani sudah melakukan pembayaran sebelum menandai pesanan ini selesai.">
                             <?= csrf_field() ?>
                               <input type="hidden" name="id" value="<?= (int) $ps['id'] ?>">
                             <input type="hidden" name="aksi" value="selesai">

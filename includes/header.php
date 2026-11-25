@@ -16,12 +16,15 @@ $judul_halaman = $judul_halaman ?? 'WiraTani';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($judul_halaman) ?> | WiraTani</title>
+  <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/img/wiratani-icon.svg">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
 </head>
 <body>
 <?php if ($layout === 'publik'): ?>
   <header class="public-nav">
-    <a class="brand" href="<?= BASE_URL ?>/index.php"><span aria-hidden="true">🌾</span> WiraTani</a>
+    <a class="brand" href="<?= BASE_URL ?>/index.php"><span aria-hidden="true">
+      <img src="<?= BASE_URL ?>/assets/img/wiratani-icon.svg" alt="WiraTani" height="40">
+    </span> WiraTani</a>
     <nav class="public-nav-links" aria-label="Menu utama">
       <a href="<?= BASE_URL ?>/index.php">Beranda</a>
       <a href="<?= BASE_URL ?>/publik/bursa.php">Bursa Kerja</a>
