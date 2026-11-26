@@ -2434,4 +2434,37 @@ body > .content {
 }
 @media (max-width: 640px) {
   .au-grid, .au-roles { grid-template-columns: 1fr; }
+  .au-wrap { margin: 20px auto 40px; padding: 0 16px; }
+  .au-shell { border-radius: 28px; }
+  .au-panel { gap: 14px; padding: 24px 22px; }
+  .au-brand { gap: 10px; font-size: 1.15rem; }
+  .au-brand svg { width: 28px; height: 34px; }
+  .au-panel h2 { margin-bottom: 8px; font-size: 1.45rem; }
+  .au-panel-body > p { font-size: 0.9rem; line-height: 1.6; }
+  .au-side { padding: 28px 24px; }
+  .au-side h1 { font-size: 1.55rem; line-height: 1.2; }
+  .au-side form { margin-top: 20px; }
+  .au-section { margin: 20px 0 10px !important; }
+  .au-field { margin-bottom: 14px; }
+  .au-input { min-width: 0; height: 48px; gap: 8px; padding: 0 12px; border-radius: 12px; }
+  .au-btn { height: 50px; border-radius: 12px; }
+  .au-alert, .au-callout { padding: 12px; }
+  .au-alt { margin-top: 18px; }
+  .au-role-body { padding: 16px; border-radius: 16px; }
+  .au-role-ico { width: 38px; height: 38px; border-radius: 12px; }
+}
+
+@media (max-width: 420px) {
+  .au-wrap { margin: 16px auto 32px; padding: 0 10px; }
+  .au-shell { border-radius: 22px; }
+  .au-panel { gap: 12px; padding: 20px 18px; }
+  .au-panel h2 { font-size: 1.35rem; }
+  .au-side { padding: 22px 18px; }
+  .au-side h1 { font-size: 1.45rem; }
+  .au-input { height: 46px; padding: 0 10px; }
+  .au-btn { height: 48px; }
+  .au-alert, .au-callout { padding: 10px 12px; }
+  .au-role-body { padding: 14px; }
+  .au-role-body small { font-size: 0.78rem; }
+  .au-role-ico { width: 36px; height: 36px; }
 }

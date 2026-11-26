@@ -17,7 +17,7 @@ $judul_halaman = $judul_halaman ?? 'WiraTani';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($judul_halaman) ?> | WiraTani</title>
   <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>/assets/img/wiratani-icon.svg">
-  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
 </head>
 <body>
 <?php if ($layout === 'publik'): ?>
