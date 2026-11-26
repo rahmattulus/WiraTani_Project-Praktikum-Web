@@ -19,6 +19,37 @@
     });
   }
 
+  /* Menu navigasi publik pada layar kecil */
+  var publicNavToggle = document.querySelector('.public-nav-toggle');
+  var publicNavLinks = document.querySelector('.public-nav-links');
+  if (publicNavToggle && publicNavLinks) {
+    function closePublicNav() {
+      publicNavLinks.classList.remove('is-open');
+      publicNavToggle.setAttribute('aria-expanded', 'false');
+      publicNavToggle.setAttribute('aria-label', 'Buka menu');
+    }
+
+    publicNavToggle.addEventListener('click', function () {
+      var isOpen = publicNavToggle.getAttribute('aria-expanded') === 'true';
+      publicNavLinks.classList.toggle('is-open', !isOpen);
+      publicNavToggle.setAttribute('aria-expanded', String(!isOpen));
+      publicNavToggle.setAttribute('aria-label', isOpen ? 'Buka menu' : 'Tutup menu');
+    });
+
+    publicNavLinks.addEventListener('click', function (event) {
+      if (event.target.closest('a')) {
+        closePublicNav();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && publicNavToggle.getAttribute('aria-expanded') === 'true') {
+        closePublicNav();
+        publicNavToggle.focus();
+      }
+    });
+  }
+
   /* Dialog aplikasi untuk pesan dan konfirmasi, tanpa dialog bawaan browser. */
   var appDialog = document.querySelector('[data-app-dialog]');
   var appDialogTitle = appDialog && appDialog.querySelector('[data-dialog-title]');

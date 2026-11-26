@@ -960,6 +960,24 @@ h2,
   gap: var(--space-4);
 }
 
+.public-nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-ctrl);
+  color: var(--forest-900);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.public-nav-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .card,
   .stat {
@@ -1553,10 +1571,6 @@ h2,
   font-weight: 800;
 }
 
-.public-footer-brand img {
-  filter: brightness(0) saturate(100%) invert(87%) sepia(20%) saturate(720%) hue-rotate(78deg);
-}
-
 .public-footer-links {
   flex-wrap: wrap;
   gap: var(--space-5);
@@ -1593,6 +1607,52 @@ h2,
 
   .public-footer-links {
     gap: var(--space-3);
+  }
+}
+
+@media (min-width: 421px) and (max-width: 639px) {
+  .public-nav {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .public-nav-links {
+    display: flex;
+    flex-basis: auto;
+    flex-wrap: nowrap;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 420px) {
+  .public-nav {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .public-nav-toggle {
+    display: inline-flex;
+  }
+
+  .public-nav-links {
+    display: none;
+    flex-basis: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+    padding-top: var(--space-2);
+  }
+
+  .public-nav-links.is-open {
+    display: grid;
+  }
+
+  .public-nav-links a {
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 
@@ -2057,6 +2117,31 @@ body > .content {
   .bk-hero { grid-template-columns: 1fr; padding: 32px 24px 72px; }
   .bk-filter { width: calc(100% - 24px); }
   .bk-btn { width: 100%; }
+}
+
+@media (max-width: 424px) {
+  .bk-page { padding: 16px 12px 40px; }
+  .bk-hero { gap: 20px; padding: 24px 16px 56px; border-radius: 24px; }
+  .bk-stats div { align-items: flex-start; gap: 8px; padding: 12px; }
+  .bk-stats dt { min-width: 0; }
+  .bk-stats dd { text-align: right; }
+  .bk-filter {
+    width: 100%;
+    margin-top: -32px;
+    padding: 16px;
+    gap: 12px;
+    border-radius: 20px;
+  }
+  .bk-field { width: 100%; min-width: 0; flex: 1 1 100%; }
+  .bk-input { width: 100%; min-width: 0; padding: 0 12px; }
+  .bk-input input, .bk-input select { width: 0; }
+  .bk-btn { width: 100%; flex: 1 1 100%; }
+  .bk-chips { gap: 8px; margin: 20px 0 22px; }
+  .bk-chips a { padding: 8px 13px; font-size: 0.86rem; }
+  .bk-grid { grid-template-columns: minmax(0, 1fr); }
+  .bk-card { padding: 20px; border-radius: 22px; }
+  .bk-card-foot { align-items: flex-start; flex-direction: column; }
+  .bk-link { white-space: normal; }
 }
 
 /* detail_lowongan.css — semua selector diawali .bd- agar tidak bentrok dengan CSS lama. */

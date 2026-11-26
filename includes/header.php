@@ -25,7 +25,12 @@ $judul_halaman = $judul_halaman ?? 'WiraTani';
     <a class="brand" href="<?= BASE_URL ?>/index.php"><span aria-hidden="true">
       <img src="<?= BASE_URL ?>/assets/img/wiratani-icon.svg" alt="WiraTani" height="40">
     </span> WiraTani</a>
-    <nav class="public-nav-links" aria-label="Menu utama">
+    <button class="public-nav-toggle" type="button" aria-label="Buka menu" aria-controls="public-nav-links" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+    <nav class="public-nav-links" id="public-nav-links" aria-label="Menu utama">
       <a href="<?= BASE_URL ?>/index.php">Beranda</a>
       <a href="<?= BASE_URL ?>/publik/bursa.php">Bursa Kerja</a>
       <a href="<?= BASE_URL ?>/auth/login.php">Masuk</a>
